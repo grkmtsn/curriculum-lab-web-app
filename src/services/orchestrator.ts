@@ -3,7 +3,7 @@ import type { AppConfig } from '../config/loader';
 import type { GenerateRequest } from '../middleware/validateRequest';
 import { buildStage1Prompt, buildStage2Prompt } from './promptBuilder';
 import { callOpenAIResponse, OpenAIClientError } from './openaiClient';
-import { validateFinalActivity, validateOutline } from './validators';
+import { validateFinalActivity, validateOutline, type FinalActivity } from './validators';
 import { checkNovelty } from './novelty';
 import { logMetric } from '../utils/logger';
 
@@ -15,7 +15,7 @@ export type OrchestratorInput = {
   requestId?: string;
 };
 
-export type OrchestratorResult = unknown;
+export type OrchestratorResult = FinalActivity['activity'];
 
 export class OrchestratorError extends Error {
   public readonly code:
@@ -191,7 +191,7 @@ async function generateStage2Final(
   input: OrchestratorInput,
   outline: unknown,
   requestId: string,
-) {
+): Promise<FinalActivity['activity']> {
   const maxRetries = getMaxRetryStage2();
   let attempt = 0;
   let lastErrors: string[] = [];
@@ -202,6 +202,7 @@ async function generateStage2Final(
       const prompt = buildStage2Prompt({
         request: input.request,
         outlineJson: outline,
+        schemaVersion: input.config.activityTemplates.schema_version,
       });
 
       const response = await callOpenAIResponse({
@@ -246,7 +247,7 @@ async function generateStage2Final(
         retries: attempt,
       });
 
-      return validation.final;
+      return validation.final.activity;
     } catch (error) {
       const latencyMs = Date.now() - startedAt;
       logMetric('stage2.attempt_failed', {
@@ -361,11 +362,7 @@ function getFinalTitle(finalActivity: unknown): string {
   if (!finalActivity || typeof finalActivity !== 'object') {
     return '';
   }
-  const activity = (finalActivity as { activity?: unknown }).activity;
-  if (!activity || typeof activity !== 'object') {
-    return '';
-  }
-  const title = (activity as { title?: unknown }).title;
+  const title = (finalActivity as { title?: unknown }).title;
   return typeof title === 'string' ? title : '';
 }
 

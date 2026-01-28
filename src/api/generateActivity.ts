@@ -7,12 +7,12 @@ import {
   RequestValidationError,
   validateGenerateRequest,
 } from '../middleware/validateRequest';
-import { orchestrateActivity, OrchestratorError } from '../services/orchestrator';
+import { orchestrateActivity, OrchestratorError, type OrchestratorResult } from '../services/orchestrator';
 import { logInfo, logMetric, logWarn } from '../utils/logger';
 
 export type GenerateActivitySuccess = {
   schema_version: typeof ACTIVITY_SCHEMA_VERSION;
-  activity: unknown;
+  activity: OrchestratorResult;
 };
 
 export type GenerateActivityError = {

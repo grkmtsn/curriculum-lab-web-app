@@ -1,31 +1,72 @@
 import * as fs from 'node:fs'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { createServerFn } from '@tanstack/react-start'
-import { createInstitutionHandler, createInstitutionSchema } from '../api/institutions';
+import { createServerFn } from '@tanstack/react-start';
+import { generateActivity } from '../api/generateActivity';
+import { useState } from 'react';
+import { createPilotTokenHandler } from '../api/pilotTokens';
 
 export const Route = createFileRoute('/')({
     component: Home,
 });
 
-const createInstitution = createServerFn({ method: 'POST' })
-    .inputValidator(createInstitutionSchema)
-    .handler(async ({ data }) => {
-        return createInstitutionHandler(data);
+const createActivity = createServerFn({ method: 'POST' })
+    .handler(async () => {
+      const defaultPayload = {
+        pilot_token: 'SRCFRn5JawXWcUYTay26tgJf1eiQ6BwDamebk8WBPKQ',
+        age_group: '3-4',
+        duration_minutes: 45,
+        theme: 'STEM',
+        group_size: 12,
+        energy_level: 'medium',
+        curriculum_style: 'Play-based',
+        regenerate: false,
+      };
+      return generateActivity(defaultPayload);
+});
+
+const createPilotToken = createServerFn({ method: 'POST' })
+    .handler(async () => {
+      const defaultPayload = {
+        institution_id: '8e9397d3-2d44-4370-8281-e48de24eebd4'
+      };
+      return createPilotTokenHandler(defaultPayload);
 });
 
 
 function Home() {
-    const router = useRouter()
-    const state = Route.useLoaderData()
+    const [result, setResult] = useState<string>('');
+    const [isLoading, setIsLoading] = useState(false);
 
     return (
+      <div>
         <button
             type="button"
-            onClick={() => {
-               createInstitution({ data: { name: "Educarium", city: "Ilfov" }})
+            onClick={async () => {
+              try {
+               const response = await createActivity();
+               console.log(response); 
+              } catch (error) {
+                console.log(error)
+              }
+               
             }}
         >
-            Create Institution
+            Create Activity
         </button>
+        <button
+            type="button"
+            onClick={async () => {
+              try {
+               const response = await createPilotToken();
+               console.log(response); 
+              } catch (error) {
+                console.log(error)
+              }
+               
+            }}
+        >
+            Create Pilot Token
+        </button>
+      </div>
     )
 }

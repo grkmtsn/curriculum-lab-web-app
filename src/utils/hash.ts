@@ -1,4 +1,5 @@
-﻿import { createHmac } from 'node:crypto';
+﻿import 'dotenv/config';
+import { createHmac } from 'node:crypto';
 
 const MIN_SALT_LENGTH = 16;
 

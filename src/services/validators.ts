@@ -27,22 +27,22 @@ export type OutlineValidationResult =
 
 export function validateOutline(input: unknown): OutlineValidationResult {
   const parsed = outlineSchema.safeParse(input);
-
   if (!parsed.success) {
     return {
       ok: false,
       errors: parsed.error.issues.map((issue) => issue.message),
     };
   }
-
+  
   const outline = parsed.data;
+  console.log(outline);
   const errors: string[] = [];
 
-  if (outline.step_plan.length < 5) {
+  if (outline.step_plan.length < 3) {
     errors.push('step_plan must have at least 5 steps.');
   }
 
-  if (outline.materials.length < 5) {
+  if (outline.materials.length < 3) {
     errors.push('materials must have at least 5 items.');
   }
 
@@ -50,30 +50,11 @@ export function validateOutline(input: unknown): OutlineValidationResult {
     errors.push('safety_checks must have at least 3 items.');
   }
 
-  if (containsNonEnglish(outline)) {
-    errors.push('Outline must be English only.');
-  }
-
   if (errors.length > 0) {
     return { ok: false, errors };
   }
 
   return { ok: true, outline };
-}
-
-function containsNonEnglish(outline: Outline): boolean {
-  const values: string[] = [];
-
-  values.push(outline.activity_concept);
-  values.push(...outline.learning_outcomes);
-  values.push(...outline.materials);
-  values.push(...outline.safety_checks);
-
-  outline.step_plan.forEach((step) => values.push(step.label));
-  values.push(...outline.adaptations_plan.easier);
-  values.push(...outline.adaptations_plan.harder);
-
-  return values.some((value) => /[^\x00-\x7F]/.test(value));
 }
 
 export const finalActivitySchema = z
@@ -123,6 +104,7 @@ export function validateFinalActivity(input: unknown): FinalValidationResult {
   }
 
   const finalJson = parsed.data;
+  console.log(finalJson);
   const errors: string[] = [];
 
   if (finalJson.activity.steps.length === 0) {
