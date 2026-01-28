@@ -115,7 +115,7 @@ Alanlar:
 -   `label`
 -   `development_focus[]`
 -   `constraints[]` (safety + pedagogy)
--   opsiyonel: `recommended_step_count_min`, `attention_span_notes`
+-   opsiyonel: `pedagogical_notes`
 
 ### 4.2 `themes.json` (7 tema, whitelist)
 

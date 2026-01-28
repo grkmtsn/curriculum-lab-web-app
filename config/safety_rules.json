@@ -1,1 +1,17 @@
-﻿[]
+﻿[
+  "Safety-first is mandatory. If an activity cannot be executed safely for the given age group, propose a safer alternative.",
+  "All activities must be age-appropriate and match the specified age group constraints.",
+  "Do not include any medical, therapeutic, diagnostic, or treatment-related claims or activities.",
+  "Avoid all unsafe materials including sharp tools, heat sources, open flames, chemicals, toxic substances, or electrical devices.",
+  "Avoid small choking hazards, especially for ages 2–3 (e.g., beads, small balls, coins, buttons, small magnets, button batteries).",
+  "Materials must be commonly available in European preschools; avoid niche or US-only supplies.",
+  "If cutting is required, specify clearly that cutting is handled by the teacher only, with pre-cut materials when possible.",
+  "Food-based activities and ingestion are not allowed in this MVP. Avoid edible materials unless explicitly stated otherwise.",
+  "Assume unknown allergies. Avoid nuts, strong fragrances, essential oils, and skin application substances.",
+  "Water play must use shallow trays only, never buckets, and must include supervision and non-slip precautions.",
+  "Movement activities must define clear physical boundaries and avoid jumping from heights or climbing on furniture.",
+  "Avoid competitive or high-risk physical challenges; prioritize cooperative and safe movement.",
+  "Safety notes must be specific to the materials and steps used in the activity, not generic statements.",
+  "When tools are used (e.g., child-safe scissors), include clear supervision and handling instructions.",
+  "Always include at least two explicit safety notes in the final output."
+]

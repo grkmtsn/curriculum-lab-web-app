@@ -1,5 +1,36 @@
 ﻿{
   "schema_version": "activity.v1",
-  "required_sections": [],
-  "style_rules": []
+  "required_sections": [
+    "title",
+    "age_group",
+    "duration_minutes",
+    "group_size",
+    "theme",
+    "goal",
+    "learning_outcomes",
+    "materials",
+    "steps",
+    "adaptations",
+    "backup_plan",
+    "teacher_tips",
+    "safety_notes"
+  ],
+  "style_rules": [
+    "Output must be valid JSON only; no markdown and no extra commentary.",
+    "All content must be in English only.",
+    "Use clear, teacher-friendly language with short sentences.",
+    "Steps must be numbered starting at 1 and written as actionable instructions.",
+    "Each step must include a time_minutes integer.",
+    "Sum of steps[].time_minutes should be approximately duration_minutes (within time_tolerance_minutes).",
+    "Materials should be commonly available in European preschools; avoid niche or US-only supplies.",
+    "Avoid unsafe items (small choking hazards, sharp tools, heat sources, chemicals). If cutting is needed, specify teacher-only handling.",
+    "Activities must be age-appropriate and aligned to the selected theme and learning outcomes.",
+    "Adaptations must include both easier and harder options (at least 2 each).",
+    "Backup plan must be a practical fallback if attention drops or materials are unavailable.",
+    "Teacher tips must focus on classroom management, facilitation prompts, and engagement strategies.",
+    "Safety notes must be specific to the activity and materials (not generic)."
+  ],
+  "min_steps": 3,
+  "min_materials": 3,
+  "time_tolerance_minutes": 10
 }

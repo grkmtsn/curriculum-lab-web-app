@@ -6,8 +6,7 @@ const ageGroupSchema = z.object({
   label: z.string(),
   development_focus: z.array(z.string()),
   constraints: z.array(z.string()),
-  recommended_step_count_min: z.number().int().positive().optional(),
-  attention_span_notes: z.string().optional(),
+  pedagogical_notes: z.array(z.string()),
 });
 
 const themeSchema = z.object({

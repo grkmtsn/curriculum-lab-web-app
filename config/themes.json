@@ -1,1 +1,153 @@
-﻿{}
+﻿{
+  "SEL": {
+    "label": "Social-Emotional Learning",
+    "learning_outcomes": [
+      "Identify and name basic emotions",
+      "Practice turn-taking and sharing",
+      "Use simple calming strategies"
+    ],
+    "suggested_activity_types": [
+      "circle time game",
+      "role-play",
+      "feelings craft",
+      "cooperative challenge"
+    ],
+    "materials_pool": [
+      "emotion cards",
+      "paper plates",
+      "markers",
+      "stickers",
+      "soft toy",
+      "music"
+    ]
+  },
+  "STEM": {
+    "label": "Early STEM",
+    "learning_outcomes": [
+      "Explore cause-and-effect",
+      "Compare, sort, and categorize",
+      "Observe and describe simple results"
+    ],
+    "suggested_activity_types": [
+      "simple experiment",
+      "build-and-test",
+      "sorting game",
+      "mini engineering challenge"
+    ],
+    "materials_pool": [
+      "cups",
+      "water",
+      "tape",
+      "paper straws",
+      "blocks",
+      "spoons"
+    ]
+  },
+  "ARTS": {
+    "label": "Arts & Creativity",
+    "learning_outcomes": [
+      "Develop fine motor control",
+      "Express ideas through color and shape",
+      "Follow simple creative steps"
+    ],
+    "suggested_activity_types": [
+      "collage",
+      "painting",
+      "clay/playdough",
+      "music & rhythm"
+    ],
+    "materials_pool": [
+      "paper",
+      "crayons",
+      "washable paint",
+      "glue stick",
+      "child-safe scissors",
+      "playdough"
+    ]
+  },
+  "LANG": {
+    "label": "Language & Storytelling",
+    "learning_outcomes": [
+      "Build vocabulary through play",
+      "Practice listening and retelling",
+      "Answer simple who/what/where questions"
+    ],
+    "suggested_activity_types": [
+      "story circle",
+      "picture talk",
+      "puppet mini-story",
+      "sound & rhyme game"
+    ],
+    "materials_pool": [
+      "picture book",
+      "puppets",
+      "flashcards",
+      "felt board",
+      "sticky notes"
+    ]
+  },
+  "MOVE": {
+    "label": "Movement & Gross Motor",
+    "learning_outcomes": [
+      "Improve balance and coordination",
+      "Practice following movement cues",
+      "Build body awareness and control"
+    ],
+    "suggested_activity_types": [
+      "obstacle course",
+      "movement freeze game",
+      "relay",
+      "yoga for kids"
+    ],
+    "materials_pool": [
+      "cones",
+      "tape lines on floor",
+      "soft balls",
+      "hoops",
+      "music"
+    ]
+  },
+  "SENSORY": {
+    "label": "Sensory & Exploration",
+    "learning_outcomes": [
+      "Explore textures and properties",
+      "Use descriptive words (soft, rough, wet, dry)",
+      "Practice focus through hands-on play"
+    ],
+    "suggested_activity_types": [
+      "sensory bin",
+      "texture hunt",
+      "mixing station",
+      "sorting by feel"
+    ],
+    "materials_pool": [
+      "rice or pasta (supervised)",
+      "scoops",
+      "containers",
+      "sponges",
+      "water tray"
+    ]
+  },
+  "NATURE": {
+    "label": "Nature & Environment",
+    "learning_outcomes": [
+      "Notice patterns in nature",
+      "Practice simple care for the environment",
+      "Observe living vs. non-living things"
+    ],
+    "suggested_activity_types": [
+      "nature walk mission",
+      "leaf/stone sorting",
+      "mini planting",
+      "recycling game"
+    ],
+    "materials_pool": [
+      "magnifying glass (teacher use)",
+      "paper bags",
+      "small pots",
+      "soil",
+      "seeds",
+      "recyclable materials"
+    ]
+  }
+}

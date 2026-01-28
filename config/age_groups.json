@@ -1,1 +1,74 @@
-﻿{}
+﻿{
+  "2-3": {
+    "label": "2–3 years",
+    "development_focus": [
+      "Developing basic independence through simple choices",
+      "Early language exposure through repetition and naming",
+      "Gross motor exploration and body awareness",
+      "Sensory exploration using hands and movement",
+      "Beginning social awareness (parallel play)"
+    ],
+    "constraints": [
+      "Activities must be very short and flexible",
+      "Instructions should be limited to one simple step at a time",
+      "Avoid all small objects that could pose choking hazards",
+      "Teacher must closely supervise all materials and interactions",
+      "Focus on process rather than outcome",
+      "No abstract concepts; learning should be concrete and experiential"
+    ],
+    "pedagogical_notes": [
+      "Learning happens primarily through sensory experience and movement",
+      "Parallel play is developmentally appropriate; cooperation is not expected",
+      "Repetition is essential and should be encouraged",
+      "Activities should allow children to enter and exit freely"
+    ]
+  },
+
+  "3-4": {
+    "label": "3–4 years",
+    "development_focus": [
+      "Expanding expressive and receptive language",
+      "Developing fine motor control through hands-on activities",
+      "Beginning cooperative play and turn-taking",
+      "Understanding simple cause-and-effect relationships",
+      "Building emotional awareness and basic self-regulation"
+    ],
+    "constraints": [
+      "Instructions should be limited to 2–3 clear steps",
+      "Activities should include opportunities for movement and rest",
+      "Materials must be safe, durable, and familiar",
+      "Tasks should allow multiple correct outcomes",
+      "Adult guidance should support, not dominate, the activity"
+    ],
+    "pedagogical_notes": [
+      "Play-based learning is the primary mode of engagement",
+      "Children benefit from verbalizing actions and observations",
+      "Mistakes are part of learning and should not be corrected harshly",
+      "Activities should balance structure with freedom"
+    ]
+  },
+
+  "5-6": {
+    "label": "5–6 years",
+    "development_focus": [
+      "Strengthening executive functions (attention, planning, persistence)",
+      "Developing early logical thinking and problem-solving skills",
+      "Improving social collaboration and role-based play",
+      "Using language to explain ideas and reflect on outcomes",
+      "Increasing independence and responsibility within group activities"
+    ],
+    "constraints": [
+      "Activities should include a clear goal but allow different solutions",
+      "Instructions can include up to 3–4 steps",
+      "Challenges should be achievable but slightly demanding",
+      "Encourage peer collaboration without forcing it",
+      "Avoid overly competitive structures"
+    ],
+    "pedagogical_notes": [
+      "Children are capable of reflecting on what worked and what did not",
+      "Problem-solving should be encouraged through open-ended questions",
+      "Activities can introduce simple rules and constraints",
+      "The teacher acts as a facilitator rather than a director"
+    ]
+  }
+}

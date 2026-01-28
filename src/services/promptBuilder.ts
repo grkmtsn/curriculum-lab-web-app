@@ -43,6 +43,7 @@ export function buildStage1Prompt(input: Stage1PromptInput): Stage1Prompt {
     `Age group: ${request.age_group} (${ageConfig?.label ?? 'unknown'}).`,
     `Development focus: ${(ageConfig?.development_focus ?? []).join('; ') || 'N/A'}.`,
     `Constraints: ${(ageConfig?.constraints ?? []).join('; ') || 'N/A'}.`,
+    `Pedagogical Notes: ${(ageConfig?.pedagogical_notes ?? []).join('; ') || 'N/A'}.`,
     `Theme: ${request.theme} (${themeConfig?.label ?? 'unknown'}).`,
     `Theme learning outcomes: ${(themeConfig?.learning_outcomes ?? []).join('; ') || 'N/A'}.`,
     `Suggested activity types: ${(themeConfig?.suggested_activity_types ?? []).join('; ') || 'N/A'}.`,
