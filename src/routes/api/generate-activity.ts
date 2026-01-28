@@ -1,37 +1,40 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { randomUUID } from 'node:crypto';
-import { createAPIFileRoute } from '@tanstack/start/api';
 import type { GenerateActivityResponse } from '../../api/generateActivity';
 import { generateActivity } from '../../api/generateActivity';
 import { logInfo } from '../../utils/logger';
 
-export const Route = createAPIFileRoute('/api/generate-activity')({
-  POST: async ({ request }) => {
-    const requestId = randomUUID();
-    let payload: unknown;
+export const Route = createFileRoute('/api/generate-activity')({
+  server: {
+    handlers: {
+      POST: async ({ request }) => {
+        const requestId = randomUUID();
+        let payload: unknown;
 
-    try {
-      payload = await request.json();
-    } catch {
-      const errorResponse: GenerateActivityResponse = {
-        error: {
-          code: 'REQUEST_INVALID',
-          message: 'Invalid JSON body.',
-          retryable: false,
-        },
-      };
+        try {
+          payload = await request.json();
+        } catch {
+          const errorResponse: GenerateActivityResponse = {
+            error: {
+              code: 'REQUEST_INVALID',
+              message: 'Invalid JSON body.',
+              retryable: false,
+            },
+          };
 
-      return jsonResponse(errorResponse, 400, requestId);
+          return jsonResponse(errorResponse, 400, requestId);
+        }
+
+        logInfo('request.received', {
+          request_id: requestId,
+          path: '/api/generate-activity',
+        });
+
+        const result = await generateActivity(payload, requestId);
+        return jsonResponse(result, statusFromResult(result), requestId);
+      },
     }
-
-    logInfo('request.received', {
-      request_id: requestId,
-      path: '/api/generate-activity',
-    });
-
-    const result = await generateActivity(payload, requestId);
-    return jsonResponse(result, statusFromResult(result), requestId);
-  },
+  }
 });
 
 function statusFromResult(result: GenerateActivityResponse): number {
