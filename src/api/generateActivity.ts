@@ -1,4 +1,5 @@
-﻿import { loadConfig } from '../config/loader';
+﻿import { randomUUID } from 'node:crypto';
+import { loadConfig } from '../config/loader';
 import { ACTIVITY_SCHEMA_VERSION } from '../config/schemas';
 import { enforceRateLimit, RateLimitError } from '../middleware/rateLimit';
 import { verifyPilotToken, PilotTokenError } from '../middleware/pilotAuth';
@@ -7,6 +8,7 @@ import {
   validateGenerateRequest,
 } from '../middleware/validateRequest';
 import { orchestrateActivity, OrchestratorError } from '../services/orchestrator';
+import { logInfo, logMetric, logWarn } from '../utils/logger';
 
 export type GenerateActivitySuccess = {
   schema_version: typeof ACTIVITY_SCHEMA_VERSION;
@@ -35,7 +37,13 @@ export type GenerateActivityError = {
 
 export type GenerateActivityResponse = GenerateActivitySuccess | GenerateActivityError;
 
-export async function generateActivity(input: unknown): Promise<GenerateActivityResponse> {
+export async function generateActivity(
+  input: unknown,
+  requestId: string = randomUUID(),
+): Promise<GenerateActivityResponse> {
+  const startedAt = Date.now();
+  logInfo('request.start', { request_id: requestId, path: '/api/generate-activity' });
+
   try {
     const request = validateGenerateRequest(input);
     const authResult = await verifyPilotToken(request.pilot_token);
@@ -47,6 +55,12 @@ export async function generateActivity(input: unknown): Promise<GenerateActivity
       request,
       institutionId: authResult.institutionId,
       config,
+      requestId,
+    });
+
+    logMetric('request.success', {
+      request_id: requestId,
+      latency_ms: Date.now() - startedAt,
     });
 
     return {
@@ -54,7 +68,33 @@ export async function generateActivity(input: unknown): Promise<GenerateActivity
       activity,
     };
   } catch (error) {
-    return mapGenerateError(error);
+    if (error instanceof RateLimitError) {
+      logMetric('rate_limit.triggered', {
+        request_id: requestId,
+      });
+    }
+
+    if (error instanceof RequestValidationError) {
+      logMetric('request.validation_failed', {
+        request_id: requestId,
+      });
+    }
+
+    if (error instanceof OrchestratorError) {
+      logWarn('request.orchestration_failed', {
+        request_id: requestId,
+        code: error.code,
+      });
+    }
+
+    const mapped = mapGenerateError(error);
+    logMetric('request.failed', {
+      request_id: requestId,
+      code: mapped.error.code,
+      latency_ms: Date.now() - startedAt,
+    });
+
+    return mapped;
   }
 }
 

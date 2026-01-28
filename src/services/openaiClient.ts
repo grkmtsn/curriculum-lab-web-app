@@ -1,4 +1,5 @@
 ﻿import OpenAI from 'openai';
+import { logInfo, logWarn } from '../utils/logger';
 import { ResponseInput } from 'openai/resources/responses/responses.js';
 
 const DEFAULT_MODEL = 'gpt-4.1';
@@ -64,7 +65,7 @@ export async function callOpenAIResponse(
     metadata,
   };
 
-  logInfo('openai.request.start', { requestId, model });
+  logInfo('openai.request.start', { request_id: requestId, model });
 
   let attempt = 0;
   while (true) {
@@ -76,8 +77,8 @@ export async function callOpenAIResponse(
       )) as unknown as OpenAIResponse;
 
       logInfo('openai.request.success', {
-        requestId,
-        responseId: response.id ?? 'unknown',
+        request_id: requestId,
+        response_id: response.id ?? 'unknown',
       });
 
       return response;
@@ -98,7 +99,7 @@ export async function callOpenAIResponse(
       }
 
       logWarn('openai.request.error', {
-        requestId,
+        request_id: requestId,
         error: error instanceof Error ? error.message : String(error),
       });
 
@@ -133,12 +134,4 @@ async function withTimeout<T>(fn: () => Promise<T>, timeoutMs: number): Promise<
 function sleepWithBackoff(attempt: number): Promise<void> {
   const delay = Math.min(500 * Math.pow(2, attempt), MAX_RETRY_DELAY_MS);
   return new Promise((resolve) => setTimeout(resolve, delay));
-}
-
-function logInfo(message: string, meta: Record<string, unknown>): void {
-  console.info(message, meta);
-}
-
-function logWarn(message: string, meta: Record<string, unknown>): void {
-  console.warn(message, meta);
 }

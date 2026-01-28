@@ -1,11 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { randomUUID } from 'node:crypto';
 import { createInstitutionHandler } from '../../api/institutions';
 import type { CreateInstitutionResponse } from '../../api/institutions';
+import { logInfo } from '../../utils/logger';
 
 export const Route = createFileRoute('/api/institutions')({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        const requestId = randomUUID();
         let payload: unknown;
 
         try {
@@ -19,11 +22,13 @@ export const Route = createFileRoute('/api/institutions')({
             },
           };
 
-          return jsonResponse(errorResponse, 400);
+          return jsonResponse(errorResponse, 400, requestId);
         }
 
+        logInfo('request.received', { request_id: requestId, path: '/api/institutions' });
+
         const result = await createInstitutionHandler(payload);
-        return jsonResponse(result, statusFromResult(result));
+        return jsonResponse(result, statusFromResult(result), requestId);
       },
     }
   }
@@ -43,11 +48,12 @@ function statusFromResult(result: CreateInstitutionResponse): number {
   }
 }
 
-function jsonResponse(body: CreateInstitutionResponse, status: number): Response {
+function jsonResponse(body: CreateInstitutionResponse, status: number, requestId: string): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       'content-type': 'application/json',
+      'x-request-id': requestId,
     },
   });
 }

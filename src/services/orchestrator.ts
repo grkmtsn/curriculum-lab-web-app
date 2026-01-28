@@ -5,12 +5,14 @@ import { buildStage1Prompt, buildStage2Prompt } from './promptBuilder';
 import { callOpenAIResponse, OpenAIClientError } from './openaiClient';
 import { validateFinalActivity, validateOutline } from './validators';
 import { checkNovelty } from './novelty';
+import { logMetric } from '../utils/logger';
 
 export type OrchestratorInput = {
   request: GenerateRequest;
   institutionId: string;
   config: AppConfig;
   recentConcepts?: string[];
+  requestId?: string;
 };
 
 export type OrchestratorResult = unknown;
@@ -46,10 +48,11 @@ export async function orchestrateActivity(
   const recentConcepts = input.recentConcepts ?? [];
   const noveltyThreshold = getNoveltyThreshold();
   let noveltyRetryUsed = false;
+  const requestId = input.requestId ?? randomUUID();
 
   while (true) {
-    const outline = await generateStage1Outline(input, recentConcepts);
-    const finalActivity = await generateStage2Final(input, outline);
+    const outline = await generateStage1Outline(input, recentConcepts, requestId);
+    const finalActivity = await generateStage2Final(input, outline, requestId);
 
     if (input.request.regenerate && recentConcepts.length > 0) {
       const title = getFinalTitle(finalActivity);
@@ -62,6 +65,12 @@ export async function orchestrateActivity(
       });
 
       if (!novelty.ok) {
+        logMetric('novelty.failed', {
+          request_id: requestId,
+          score: novelty.score,
+          threshold: noveltyThreshold,
+        });
+
         if (!noveltyRetryUsed) {
           noveltyRetryUsed = true;
           continue;
@@ -79,13 +88,17 @@ export async function orchestrateActivity(
   }
 }
 
-async function generateStage1Outline(input: OrchestratorInput, recentConcepts: string[]) {
+async function generateStage1Outline(
+  input: OrchestratorInput,
+  recentConcepts: string[],
+  requestId: string,
+) {
   const maxRetries = getMaxRetryStage1();
-  const requestId = randomUUID();
   let attempt = 0;
   let lastErrors: string[] = [];
 
   while (attempt <= maxRetries) {
+    const startedAt = Date.now();
     try {
       const prompt = buildStage1Prompt({
         request: input.request,
@@ -128,8 +141,22 @@ async function generateStage1Outline(input: OrchestratorInput, recentConcepts: s
         throw new Error('Outline validation failed');
       }
 
+      logMetric('stage1.success', {
+        request_id: requestId,
+        latency_ms: Date.now() - startedAt,
+        retries: attempt,
+      });
+
       return validation.outline;
     } catch (error) {
+      const latencyMs = Date.now() - startedAt;
+      logMetric('stage1.attempt_failed', {
+        request_id: requestId,
+        latency_ms: latencyMs,
+        attempt,
+        error: error instanceof Error ? error.message : String(error),
+      });
+
       if (error instanceof OpenAIClientError) {
         throw new OrchestratorError(error.code, error.message, error.retryable);
       }
@@ -138,6 +165,11 @@ async function generateStage1Outline(input: OrchestratorInput, recentConcepts: s
         attempt += 1;
         continue;
       }
+
+      logMetric('stage1.validation_failed', {
+        request_id: requestId,
+        errors: lastErrors,
+      });
 
       throw new OrchestratorError(
         'OUTLINE_VALIDATION_FAILED',
@@ -154,13 +186,17 @@ async function generateStage1Outline(input: OrchestratorInput, recentConcepts: s
   );
 }
 
-async function generateStage2Final(input: OrchestratorInput, outline: unknown) {
+async function generateStage2Final(
+  input: OrchestratorInput,
+  outline: unknown,
+  requestId: string,
+) {
   const maxRetries = getMaxRetryStage2();
-  const requestId = randomUUID();
   let attempt = 0;
   let lastErrors: string[] = [];
 
   while (attempt <= maxRetries) {
+    const startedAt = Date.now();
     try {
       const prompt = buildStage2Prompt({
         request: input.request,
@@ -202,8 +238,22 @@ async function generateStage2Final(input: OrchestratorInput, outline: unknown) {
         throw new Error('Final validation failed');
       }
 
+      logMetric('stage2.success', {
+        request_id: requestId,
+        latency_ms: Date.now() - startedAt,
+        retries: attempt,
+      });
+
       return validation.final;
     } catch (error) {
+      const latencyMs = Date.now() - startedAt;
+      logMetric('stage2.attempt_failed', {
+        request_id: requestId,
+        latency_ms: latencyMs,
+        attempt,
+        error: error instanceof Error ? error.message : String(error),
+      });
+
       if (error instanceof OpenAIClientError) {
         throw new OrchestratorError(error.code, error.message, error.retryable);
       }
@@ -212,6 +262,11 @@ async function generateStage2Final(input: OrchestratorInput, outline: unknown) {
         attempt += 1;
         continue;
       }
+
+      logMetric('stage2.validation_failed', {
+        request_id: requestId,
+        errors: lastErrors,
+      });
 
       throw new OrchestratorError(
         'FINAL_VALIDATION_FAILED',

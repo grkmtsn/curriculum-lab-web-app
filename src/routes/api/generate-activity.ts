@@ -1,33 +1,37 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { randomUUID } from 'node:crypto';
+import { createAPIFileRoute } from '@tanstack/start/api';
 import type { GenerateActivityResponse } from '../../api/generateActivity';
 import { generateActivity } from '../../api/generateActivity';
+import { logInfo } from '../../utils/logger';
 
-export const Route = createFileRoute('/api/generate-activity')({
+export const Route = createAPIFileRoute('/api/generate-activity')({
+  POST: async ({ request }) => {
+    const requestId = randomUUID();
+    let payload: unknown;
 
-  server: {
-    handlers: {
-      POST: async ({ request }) => {
-        let payload: unknown;
+    try {
+      payload = await request.json();
+    } catch {
+      const errorResponse: GenerateActivityResponse = {
+        error: {
+          code: 'REQUEST_INVALID',
+          message: 'Invalid JSON body.',
+          retryable: false,
+        },
+      };
 
-        try {
-          payload = await request.json();
-        } catch {
-          const errorResponse: GenerateActivityResponse = {
-            error: {
-              code: 'REQUEST_INVALID',
-              message: 'Invalid JSON body.',
-              retryable: false,
-            },
-          };
-
-          return jsonResponse(errorResponse, 400);
-        }
-
-        const result = await generateActivity(payload);
-        return jsonResponse(result, statusFromResult(result));
-      },
+      return jsonResponse(errorResponse, 400, requestId);
     }
-  }
+
+    logInfo('request.received', {
+      request_id: requestId,
+      path: '/api/generate-activity',
+    });
+
+    const result = await generateActivity(payload, requestId);
+    return jsonResponse(result, statusFromResult(result), requestId);
+  },
 });
 
 function statusFromResult(result: GenerateActivityResponse): number {
@@ -56,11 +60,12 @@ function statusFromResult(result: GenerateActivityResponse): number {
   }
 }
 
-function jsonResponse(body: GenerateActivityResponse, status: number): Response {
+function jsonResponse(body: GenerateActivityResponse, status: number, requestId: string): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       'content-type': 'application/json',
+      'x-request-id': requestId,
     },
   });
 }
