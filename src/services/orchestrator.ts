@@ -4,11 +4,13 @@ import type { GenerateRequest } from '../middleware/validateRequest';
 import { buildStage1Prompt, buildStage2Prompt } from './promptBuilder';
 import { callOpenAIResponse, OpenAIClientError } from './openaiClient';
 import { validateFinalActivity, validateOutline } from './validators';
+import { checkNovelty } from './novelty';
 
 export type OrchestratorInput = {
   request: GenerateRequest;
   institutionId: string;
   config: AppConfig;
+  recentConcepts?: string[];
 };
 
 export type OrchestratorResult = unknown;
@@ -41,13 +43,43 @@ export class OrchestratorError extends Error {
 export async function orchestrateActivity(
   input: OrchestratorInput,
 ): Promise<OrchestratorResult> {
-  const outline = await generateStage1Outline(input);
-  const finalActivity = await generateStage2Final(input, outline);
+  const recentConcepts = input.recentConcepts ?? [];
+  const noveltyThreshold = getNoveltyThreshold();
+  let noveltyRetryUsed = false;
 
-  return finalActivity;
+  while (true) {
+    const outline = await generateStage1Outline(input, recentConcepts);
+    const finalActivity = await generateStage2Final(input, outline);
+
+    if (input.request.regenerate && recentConcepts.length > 0) {
+      const title = getFinalTitle(finalActivity);
+      const concept = getOutlineConcept(outline);
+      const novelty = checkNovelty({
+        title,
+        concept,
+        recentConcepts,
+        threshold: noveltyThreshold,
+      });
+
+      if (!novelty.ok) {
+        if (!noveltyRetryUsed) {
+          noveltyRetryUsed = true;
+          continue;
+        }
+
+        throw new OrchestratorError(
+          'NOVELTY_CHECK_FAILED',
+          'Generated activity too similar to recent concepts.',
+          false,
+        );
+      }
+    }
+
+    return finalActivity;
+  }
 }
 
-async function generateStage1Outline(input: OrchestratorInput) {
+async function generateStage1Outline(input: OrchestratorInput, recentConcepts: string[]) {
   const maxRetries = getMaxRetryStage1();
   const requestId = randomUUID();
   let attempt = 0;
@@ -58,6 +90,7 @@ async function generateStage1Outline(input: OrchestratorInput) {
       const prompt = buildStage1Prompt({
         request: input.request,
         config: input.config,
+        recentConcepts,
       });
 
       const response = await callOpenAIResponse({
@@ -241,4 +274,32 @@ function getMaxRetryStage2(): number {
     return 1;
   }
   return value;
+}
+
+function getNoveltyThreshold(): number {
+  const value = Number.parseFloat(process.env.NOVELTY_THRESHOLD ?? '0.6');
+  if (!Number.isFinite(value) || value <= 0) {
+    return 0.6;
+  }
+  return value;
+}
+
+function getFinalTitle(finalActivity: unknown): string {
+  if (!finalActivity || typeof finalActivity !== 'object') {
+    return '';
+  }
+  const activity = (finalActivity as { activity?: unknown }).activity;
+  if (!activity || typeof activity !== 'object') {
+    return '';
+  }
+  const title = (activity as { title?: unknown }).title;
+  return typeof title === 'string' ? title : '';
+}
+
+function getOutlineConcept(outline: unknown): string {
+  if (!outline || typeof outline !== 'object') {
+    return '';
+  }
+  const concept = (outline as { activity_concept?: unknown }).activity_concept;
+  return typeof concept === 'string' ? concept : '';
 }
