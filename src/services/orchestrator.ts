@@ -1,9 +1,9 @@
 ﻿import { randomUUID } from 'node:crypto';
 import type { AppConfig } from '../config/loader';
 import type { GenerateRequest } from '../middleware/validateRequest';
-import { buildStage1Prompt } from './promptBuilder';
+import { buildStage1Prompt, buildStage2Prompt } from './promptBuilder';
 import { callOpenAIResponse, OpenAIClientError } from './openaiClient';
-import { validateOutline } from './validators';
+import { validateFinalActivity, validateOutline } from './validators';
 
 export type OrchestratorInput = {
   request: GenerateRequest;
@@ -42,13 +42,9 @@ export async function orchestrateActivity(
   input: OrchestratorInput,
 ): Promise<OrchestratorResult> {
   const outline = await generateStage1Outline(input);
+  const finalActivity = await generateStage2Final(input, outline);
 
-  // Stage 2 not implemented yet.
-  throw new OrchestratorError(
-    'FINAL_VALIDATION_FAILED',
-    'Stage 2 generation not implemented.',
-    false,
-  );
+  return finalActivity;
 }
 
 async function generateStage1Outline(input: OrchestratorInput) {
@@ -125,6 +121,80 @@ async function generateStage1Outline(input: OrchestratorInput) {
   );
 }
 
+async function generateStage2Final(input: OrchestratorInput, outline: unknown) {
+  const maxRetries = getMaxRetryStage2();
+  const requestId = randomUUID();
+  let attempt = 0;
+  let lastErrors: string[] = [];
+
+  while (attempt <= maxRetries) {
+    try {
+      const prompt = buildStage2Prompt({
+        request: input.request,
+        outlineJson: outline,
+      });
+
+      const response = await callOpenAIResponse({
+        requestId,
+        model: process.env.OPENAI_MODEL_STAGE2 ?? 'gpt-4.1',
+        input: [
+          {
+            role: 'system',
+            content: [{ type: 'input_text', text: prompt.system }],
+          },
+          {
+            role: 'user',
+            content: [{ type: 'input_text', text: prompt.user }],
+          },
+        ],
+      });
+
+      const outputText = extractOutputText(response);
+      if (!outputText) {
+        lastErrors = ['OpenAI response did not include text output.'];
+        throw new Error('Missing output text');
+      }
+
+      let finalJson: unknown;
+      try {
+        finalJson = JSON.parse(outputText);
+      } catch {
+        lastErrors = ['Final activity is not valid JSON.'];
+        throw new Error('Invalid JSON');
+      }
+
+      const validation = validateFinalActivity(finalJson);
+      if (!validation.ok) {
+        lastErrors = validation.errors;
+        throw new Error('Final validation failed');
+      }
+
+      return validation.final;
+    } catch (error) {
+      if (error instanceof OpenAIClientError) {
+        throw new OrchestratorError(error.code, error.message, error.retryable);
+      }
+
+      if (attempt < maxRetries) {
+        attempt += 1;
+        continue;
+      }
+
+      throw new OrchestratorError(
+        'FINAL_VALIDATION_FAILED',
+        lastErrors.join(' '),
+        false,
+      );
+    }
+  }
+
+  throw new OrchestratorError(
+    'FINAL_VALIDATION_FAILED',
+    'Final validation failed.',
+    false,
+  );
+}
+
 function extractOutputText(response: unknown): string | null {
   if (!response || typeof response !== 'object') {
     return null;
@@ -161,6 +231,14 @@ function getMaxRetryStage1(): number {
   const value = Number.parseInt(process.env.MAX_RETRY_STAGE1 ?? '2', 10);
   if (!Number.isFinite(value) || value < 0) {
     return 2;
+  }
+  return value;
+}
+
+function getMaxRetryStage2(): number {
+  const value = Number.parseInt(process.env.MAX_RETRY_STAGE2 ?? '1', 10);
+  if (!Number.isFinite(value) || value < 0) {
+    return 1;
   }
   return value;
 }
