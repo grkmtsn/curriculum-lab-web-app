@@ -1,1 +1,25 @@
-﻿// Prisma schema placeholder
+generator client {
+  provider = "prisma-client"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Institution {
+  id         String      @id @default(uuid())
+  name       String?
+  city       String
+  createdAt  DateTime    @default(now())
+  pilotTokens PilotToken[]
+}
+
+model PilotToken {
+  tokenHash     String      @id
+  institutionId String
+  institution   Institution @relation(fields: [institutionId], references: [id])
+  expiresAt     DateTime
+  revokedAt     DateTime?
+  createdAt     DateTime    @default(now())
+}

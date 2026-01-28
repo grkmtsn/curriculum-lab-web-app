@@ -1,9 +1,8 @@
-﻿{
+{
   "name": "curriculum-lab",
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "packageManager": "pnpm@9",
   "scripts": {
     "dev": "tanstack start dev",
     "build": "tanstack start build",
@@ -15,8 +14,11 @@
     "db:generate": "prisma generate"
   },
   "dependencies": {
-    "@prisma/client": "^5.16.0",
-    "@tanstack/start": "^1.0.0",
+    "@prisma/adapter-pg": "^7.3.0",
+    "@prisma/client": "^7.3.0",
+    "@tanstack/start": "^1.120.20",
+    "dotenv": "^17.2.3",
+    "pg": "^8.17.2",
     "zod": "^3.23.0"
   },
   "devDependencies": {
@@ -24,8 +26,8 @@
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.2.0",
-    "prisma": "^5.16.0",
+    "prisma": "^7.3.0",
     "typescript": "^5.5.0",
-    "vitest": "^1.6.0"
+    "vitest": "^4.0.18"
   }
 }
