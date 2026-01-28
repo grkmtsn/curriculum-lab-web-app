@@ -1,5 +1,5 @@
-﻿import fs from 'node:fs';
-import path from 'node:path';
+﻿import fs from "node:fs";
+import path from "node:path";
 import {
   activityTemplatesConfigSchema,
   ageGroupsConfigSchema,
@@ -9,7 +9,7 @@ import {
   type AgeGroupsConfig,
   type SafetyRulesConfig,
   type ThemesConfig,
-} from './schemas';
+} from "./schemas";
 
 export type AppConfig = {
   ageGroups: AgeGroupsConfig;
@@ -20,11 +20,11 @@ export type AppConfig = {
 
 let cachedConfig: AppConfig | null = null;
 
-const CONFIG_DIR = path.resolve(process.cwd(), 'config');
+const CONFIG_DIR = path.resolve(process.cwd(), "config");
 
 function readJsonFile<T>(filename: string): T {
   const fullPath = path.join(CONFIG_DIR, filename);
-  const raw = fs.readFileSync(fullPath, 'utf-8');
+  const raw = fs.readFileSync(fullPath, "utf-8");
   return JSON.parse(raw) as T;
 }
 
@@ -33,10 +33,10 @@ export function loadConfig(): AppConfig {
     return cachedConfig;
   }
 
-  const ageGroupsRaw = readJsonFile<unknown>('age_groups.json');
-  const themesRaw = readJsonFile<unknown>('themes.json');
-  const templatesRaw = readJsonFile<unknown>('activity_templates.json');
-  const safetyRulesRaw = readJsonFile<unknown>('safety_rules.json');
+  const ageGroupsRaw = readJsonFile<unknown>("age_groups.json");
+  const themesRaw = readJsonFile<unknown>("themes.json");
+  const templatesRaw = readJsonFile<unknown>("activity_templates.json");
+  const safetyRulesRaw = readJsonFile<unknown>("safety_rules.json");
 
   const ageGroups = ageGroupsConfigSchema.parse(ageGroupsRaw);
   const themes = themesConfigSchema.parse(themesRaw);

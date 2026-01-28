@@ -1,5 +1,5 @@
-﻿import { z } from 'zod';
-import { ACTIVITY_SCHEMA_VERSION } from '../config/schemas';
+﻿import { z } from "zod";
+import { ACTIVITY_SCHEMA_VERSION } from "../config/schemas";
 
 export const outlineSchema = z.object({
   activity_concept: z.string(),
@@ -33,21 +33,21 @@ export function validateOutline(input: unknown): OutlineValidationResult {
       errors: parsed.error.issues.map((issue) => issue.message),
     };
   }
-  
+
   const outline = parsed.data;
   console.log(outline);
   const errors: string[] = [];
 
   if (outline.step_plan.length < 3) {
-    errors.push('step_plan must have at least 5 steps.');
+    errors.push("step_plan must have at least 5 steps.");
   }
 
   if (outline.materials.length < 3) {
-    errors.push('materials must have at least 5 items.');
+    errors.push("materials must have at least 5 items.");
   }
 
   if (outline.safety_checks.length < 3) {
-    errors.push('safety_checks must have at least 3 items.');
+    errors.push("safety_checks must have at least 3 items.");
   }
 
   if (errors.length > 0) {
@@ -108,15 +108,15 @@ export function validateFinalActivity(input: unknown): FinalValidationResult {
   const errors: string[] = [];
 
   if (finalJson.activity.steps.length === 0) {
-    errors.push('steps must not be empty.');
+    errors.push("steps must not be empty.");
   }
 
   if (finalJson.activity.materials.length === 0) {
-    errors.push('materials must not be empty.');
+    errors.push("materials must not be empty.");
   }
 
   if (finalJson.activity.safety_notes.length === 0) {
-    errors.push('safety_notes must not be empty.');
+    errors.push("safety_notes must not be empty.");
   }
 
   const stepTotal = finalJson.activity.steps.reduce(
@@ -126,7 +126,7 @@ export function validateFinalActivity(input: unknown): FinalValidationResult {
 
   const duration = finalJson.activity.duration_minutes;
   if (Math.abs(stepTotal - duration) > 10) {
-    errors.push('Sum of step time_minutes must be within ±10 minutes of duration.');
+    errors.push("Sum of step time_minutes must be within ±10 minutes of duration.");
   }
 
   if (errors.length > 0) {

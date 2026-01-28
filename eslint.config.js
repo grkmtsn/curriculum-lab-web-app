@@ -8,7 +8,7 @@ import { defineConfig } from "eslint/config";
 import tseslint from "typescript-eslint";
 
 export default defineConfig({
-  files: ["**/*.{ts,tsx}"],
+  files: ["src/**/*.{ts,tsx}"],
   languageOptions: {
     parser: tseslint.parser,
     parserOptions: {
@@ -28,5 +28,15 @@ export default defineConfig({
   rules: {
     "@typescript-eslint/no-deprecated": "warn",
   },
-  ignores: ["dist", ".wrangler", ".vercel", ".netlify", ".output", "build/"],
+  ignores: [
+    "dist",
+    ".wrangler",
+    ".vercel",
+    ".netlify",
+    ".output",
+    "build/",
+    "prisma/generated",
+    "prisma/migration",
+    "prisma.config.ts",
+  ],
 });

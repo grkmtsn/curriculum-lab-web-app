@@ -7,10 +7,10 @@ export function todayKeyUtc(date: Date = new Date()): string {
 }
 
 export const RATE_LIMIT_PER_DAY = Number.parseInt(
-  process.env.RATE_LIMIT_PER_DAY ?? '10',
+  process.env.RATE_LIMIT_PER_DAY ?? "10",
   10,
 );
 
 if (!Number.isFinite(RATE_LIMIT_PER_DAY) || RATE_LIMIT_PER_DAY <= 0) {
-  throw new Error('RATE_LIMIT_PER_DAY must be a positive integer.');
+  throw new Error("RATE_LIMIT_PER_DAY must be a positive integer.");
 }

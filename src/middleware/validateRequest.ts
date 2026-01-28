@@ -1,12 +1,12 @@
-﻿import { z } from 'zod';
-import { loadConfig } from '../config/loader';
+﻿import { z } from "zod";
+import { loadConfig } from "../config/loader";
 
-const ENERGY_LEVELS = ['calm', 'medium', 'active'] as const;
+const ENERGY_LEVELS = ["calm", "medium", "active"] as const;
 const CURRICULUM_STYLES = [
-  'Play-based',
-  'Montessori-inspired',
-  'Reggio-inspired',
-  'Mixed',
+  "Play-based",
+  "Montessori-inspired",
+  "Reggio-inspired",
+  "Mixed",
 ] as const;
 
 const DURATION_OPTIONS = [30, 45, 60] as const;
@@ -28,12 +28,12 @@ export type GenerateRequest = {
 };
 
 export class RequestValidationError extends Error {
-  public readonly code: 'REQUEST_INVALID';
+  public readonly code: "REQUEST_INVALID";
   public readonly retryable: boolean;
 
   constructor(message: string) {
     super(message);
-    this.code = 'REQUEST_INVALID';
+    this.code = "REQUEST_INVALID";
     this.retryable = false;
   }
 }
@@ -50,19 +50,29 @@ export function validateGenerateRequest(input: unknown): GenerateRequest {
         .trim()
         .min(PILOT_TOKEN_MIN_LENGTH)
         .max(PILOT_TOKEN_MAX_LENGTH)
-        .regex(PILOT_TOKEN_REGEX, 'Invalid pilot_token format.'),
-      age_group: z.string().trim().refine((value) => allowedAgeGroups.has(value), {
-        message: 'Unsupported age_group.',
-      }),
+        .regex(PILOT_TOKEN_REGEX, "Invalid pilot_token format."),
+      age_group: z
+        .string()
+        .trim()
+        .refine((value) => allowedAgeGroups.has(value), {
+          message: "Unsupported age_group.",
+        }),
       duration_minutes: z
         .number()
         .int()
-        .refine((value) => DURATION_OPTIONS.includes(value as (typeof DURATION_OPTIONS)[number]), {
-          message: 'Unsupported duration_minutes.',
+        .refine(
+          (value) =>
+            DURATION_OPTIONS.includes(value as (typeof DURATION_OPTIONS)[number]),
+          {
+            message: "Unsupported duration_minutes.",
+          },
+        ),
+      theme: z
+        .string()
+        .trim()
+        .refine((value) => allowedThemes.has(value), {
+          message: "Unsupported theme.",
         }),
-      theme: z.string().trim().refine((value) => allowedThemes.has(value), {
-        message: 'Unsupported theme.',
-      }),
       group_size: z.number().int().min(GROUP_SIZE_MIN).max(GROUP_SIZE_MAX),
       energy_level: z.enum(ENERGY_LEVELS).optional(),
       curriculum_style: z.enum(CURRICULUM_STYLES).optional(),
@@ -74,8 +84,8 @@ export function validateGenerateRequest(input: unknown): GenerateRequest {
     return schema.parse(input);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const message = error.issues.map((issue) => issue.message).join(' ');
-      throw new RequestValidationError(message || 'Invalid request.');
+      const message = error.issues.map((issue) => issue.message).join(" ");
+      throw new RequestValidationError(message || "Invalid request.");
     }
     throw error;
   }

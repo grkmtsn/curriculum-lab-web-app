@@ -1,38 +1,38 @@
-﻿import { randomUUID } from 'node:crypto';
-import { loadConfig } from '../config/loader';
-import { ACTIVITY_SCHEMA_VERSION } from '../config/schemas';
-import { enforceRateLimit, RateLimitError } from '../middleware/rateLimit';
-import { verifyPilotToken, PilotTokenError } from '../middleware/pilotAuth';
+﻿import { randomUUID } from "node:crypto";
+import { Prisma } from "../../prisma/generated/client";
+import { loadConfig } from "../config/loader";
+import { ACTIVITY_SCHEMA_VERSION } from "../config/schemas";
+import { createGeneration } from "../db/repo";
+import { PilotTokenError, verifyPilotToken } from "../middleware/pilotAuth";
+import { enforceRateLimit, RateLimitError } from "../middleware/rateLimit";
 import {
   RequestValidationError,
   validateGenerateRequest,
-} from '../middleware/validateRequest';
-import { orchestrateActivity, OrchestratorError } from '../services/orchestrator';
-import type { FinalActivity } from '../services/validators';
-import { logInfo, logMetric, logWarn } from '../utils/logger';
-import { createGeneration } from '../db/repo';
-import { Prisma } from '../../prisma/generated/client';
+} from "../middleware/validateRequest";
+import { orchestrateActivity, OrchestratorError } from "../services/orchestrator";
+import type { FinalActivity } from "../services/validators";
+import { logInfo, logMetric, logWarn } from "../utils/logger";
 
 export type GenerateActivitySuccess = {
   schema_version: typeof ACTIVITY_SCHEMA_VERSION;
-  activity: FinalActivity['activity'];
+  activity: FinalActivity["activity"];
 };
 
 export type GenerateActivityError = {
   error: {
     code:
-      | 'TOKEN_MISSING'
-      | 'TOKEN_INVALID'
-      | 'TOKEN_EXPIRED'
-      | 'TOKEN_REVOKED'
-      | 'RATE_LIMITED'
-      | 'REQUEST_INVALID'
-      | 'OPENAI_TIMEOUT'
-      | 'OPENAI_ERROR'
-      | 'OUTLINE_VALIDATION_FAILED'
-      | 'FINAL_VALIDATION_FAILED'
-      | 'NOVELTY_CHECK_FAILED'
-      | 'UNKNOWN_ERROR';
+      | "TOKEN_MISSING"
+      | "TOKEN_INVALID"
+      | "TOKEN_EXPIRED"
+      | "TOKEN_REVOKED"
+      | "RATE_LIMITED"
+      | "REQUEST_INVALID"
+      | "OPENAI_TIMEOUT"
+      | "OPENAI_ERROR"
+      | "OUTLINE_VALIDATION_FAILED"
+      | "FINAL_VALIDATION_FAILED"
+      | "NOVELTY_CHECK_FAILED"
+      | "UNKNOWN_ERROR";
     message: string;
     retryable: boolean;
   };
@@ -45,7 +45,7 @@ export async function generateActivity(
   requestId: string = randomUUID(),
 ): Promise<GenerateActivityResponse> {
   const startedAt = Date.now();
-  logInfo('request.start', { request_id: requestId, path: '/api/generate-activity' });
+  logInfo("request.start", { request_id: requestId, path: "/api/generate-activity" });
 
   let requestPayload: ReturnType<typeof validateGenerateRequest> | null = null;
   let institutionId: string | null = null;
@@ -71,7 +71,7 @@ export async function generateActivity(
     finalJson = result.activity;
     outlineJson = result.outline;
 
-    logMetric('request.success', {
+    logMetric("request.success", {
       request_id: requestId,
       latency_ms: Date.now() - startedAt,
     });
@@ -84,7 +84,8 @@ export async function generateActivity(
         finalJson,
         validationPass: true,
         latencyMs: Date.now() - startedAt,
-        modelName: process.env.OPENAI_MODEL_STAGE2 ?? process.env.OPENAI_MODEL_STAGE1 ?? null,
+        modelName:
+          process.env.OPENAI_MODEL_STAGE2 ?? process.env.OPENAI_MODEL_STAGE1 ?? null,
         regenerateFlag: request.regenerate ?? false,
         errorCode: null,
       });
@@ -96,26 +97,26 @@ export async function generateActivity(
     };
   } catch (error) {
     if (error instanceof RateLimitError) {
-      logMetric('rate_limit.triggered', {
+      logMetric("rate_limit.triggered", {
         request_id: requestId,
       });
     }
 
     if (error instanceof RequestValidationError) {
-      logMetric('request.validation_failed', {
+      logMetric("request.validation_failed", {
         request_id: requestId,
       });
     }
 
     if (error instanceof OrchestratorError) {
-      logWarn('request.orchestration_failed', {
+      logWarn("request.orchestration_failed", {
         request_id: requestId,
         code: error.code,
       });
     }
 
     const mapped = mapGenerateError(error);
-    logMetric('request.failed', {
+    logMetric("request.failed", {
       request_id: requestId,
       code: mapped.error.code,
       latency_ms: Date.now() - startedAt,
@@ -129,7 +130,8 @@ export async function generateActivity(
         finalJson,
         validationPass: false,
         latencyMs: Date.now() - startedAt,
-        modelName: process.env.OPENAI_MODEL_STAGE2 ?? process.env.OPENAI_MODEL_STAGE1 ?? null,
+        modelName:
+          process.env.OPENAI_MODEL_STAGE2 ?? process.env.OPENAI_MODEL_STAGE1 ?? null,
         regenerateFlag: requestPayload.regenerate ?? false,
         errorCode: mapped.error.code,
       });
@@ -182,8 +184,8 @@ function mapGenerateError(error: unknown): GenerateActivityError {
 
   return {
     error: {
-      code: 'UNKNOWN_ERROR',
-      message: 'Unexpected error while generating activity.',
+      code: "UNKNOWN_ERROR",
+      message: "Unexpected error while generating activity.",
       retryable: false,
     },
   };

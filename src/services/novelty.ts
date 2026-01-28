@@ -40,7 +40,7 @@ export function checkNovelty(input: NoveltyCheckInput): NoveltyCheckResult {
 function tokenize(input: string): Set<string> {
   const tokens = input
     .toLowerCase()
-    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/[^a-z0-9\s]/g, " ")
     .split(/\s+/)
     .filter(Boolean);
 

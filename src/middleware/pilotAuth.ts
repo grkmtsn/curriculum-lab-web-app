@@ -1,5 +1,5 @@
-﻿import { findPilotTokenByHash } from '../db/repo';
-import { hashPilotToken } from '../utils/hash';
+﻿import { findPilotTokenByHash } from "../db/repo";
+import { hashPilotToken } from "../utils/hash";
 
 export type PilotAuthResult = {
   institutionId: string;
@@ -8,14 +8,14 @@ export type PilotAuthResult = {
 
 export class PilotTokenError extends Error {
   public readonly code:
-    | 'TOKEN_MISSING'
-    | 'TOKEN_INVALID'
-    | 'TOKEN_EXPIRED'
-    | 'TOKEN_REVOKED';
+    | "TOKEN_MISSING"
+    | "TOKEN_INVALID"
+    | "TOKEN_EXPIRED"
+    | "TOKEN_REVOKED";
   public readonly retryable: boolean;
 
   constructor(
-    code: 'TOKEN_MISSING' | 'TOKEN_INVALID' | 'TOKEN_EXPIRED' | 'TOKEN_REVOKED',
+    code: "TOKEN_MISSING" | "TOKEN_INVALID" | "TOKEN_EXPIRED" | "TOKEN_REVOKED",
     message: string,
     retryable = false,
   ) {
@@ -37,23 +37,23 @@ export async function verifyPilotToken(pilotToken: string): Promise<PilotAuthRes
     token.length > MAX_PILOT_TOKEN_LENGTH ||
     !PILOT_TOKEN_REGEX.test(token)
   ) {
-    throw new PilotTokenError('TOKEN_MISSING', 'Pilot token is missing.');
+    throw new PilotTokenError("TOKEN_MISSING", "Pilot token is missing.");
   }
 
   const tokenHash = hashPilotToken(token);
   const record = await findPilotTokenByHash(tokenHash);
 
   if (!record) {
-    throw new PilotTokenError('TOKEN_INVALID', 'Pilot token is invalid.');
+    throw new PilotTokenError("TOKEN_INVALID", "Pilot token is invalid.");
   }
 
   if (record.revokedAt) {
-    throw new PilotTokenError('TOKEN_REVOKED', 'Pilot token has been revoked.');
+    throw new PilotTokenError("TOKEN_REVOKED", "Pilot token has been revoked.");
   }
 
   const now = new Date();
   if (record.expiresAt.getTime() <= now.getTime()) {
-    throw new PilotTokenError('TOKEN_EXPIRED', 'Pilot token has expired.', true);
+    throw new PilotTokenError("TOKEN_EXPIRED", "Pilot token has expired.", true);
   }
 
   return {

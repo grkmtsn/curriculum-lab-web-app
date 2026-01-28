@@ -1,6 +1,6 @@
-﻿import { z } from 'zod';
+﻿import { z } from "zod";
 
-export const ACTIVITY_SCHEMA_VERSION = 'activity.v1';
+export const ACTIVITY_SCHEMA_VERSION = "activity.v1";
 
 const ageGroupSchema = z.object({
   label: z.string(),

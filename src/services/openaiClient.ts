@@ -1,8 +1,8 @@
-﻿import OpenAI from 'openai';
-import { logInfo, logMetric, logWarn } from '../utils/logger';
-import { ResponseInput } from 'openai/resources/responses/responses.js';
+﻿import OpenAI from "openai";
+import { ResponseInput } from "openai/resources/responses/responses.js";
+import { logInfo, logMetric, logWarn } from "../utils/logger";
 
-const DEFAULT_MODEL = 'gpt-4.1';
+const DEFAULT_MODEL = "gpt-4.1";
 const DEFAULT_TIMEOUT_MS = 25000;
 const MAX_RETRY_DELAY_MS = 4000;
 
@@ -22,10 +22,14 @@ export type OpenAIResponse = {
 };
 
 export class OpenAIClientError extends Error {
-  public readonly code: 'OPENAI_TIMEOUT' | 'OPENAI_ERROR';
+  public readonly code: "OPENAI_TIMEOUT" | "OPENAI_ERROR";
   public readonly retryable: boolean;
 
-  constructor(code: 'OPENAI_TIMEOUT' | 'OPENAI_ERROR', message: string, retryable: boolean) {
+  constructor(
+    code: "OPENAI_TIMEOUT" | "OPENAI_ERROR",
+    message: string,
+    retryable: boolean,
+  ) {
     super(message);
     this.code = code;
     this.retryable = retryable;
@@ -44,7 +48,7 @@ function getClient(): OpenAI {
 
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    throw new OpenAIClientError('OPENAI_ERROR', 'OPENAI_API_KEY is not set.', false);
+    throw new OpenAIClientError("OPENAI_ERROR", "OPENAI_API_KEY is not set.", false);
   }
 
   cachedClient = new OpenAI({ apiKey });
@@ -71,7 +75,7 @@ export async function callOpenAIResponse(
     max_output_tokens: maxOutputTokens,
   };
 
-  logInfo('openai.request.start', { request_id: requestId, model });
+  logInfo("openai.request.start", { request_id: requestId, model });
 
   let attempt = 0;
   while (true) {
@@ -81,12 +85,12 @@ export async function callOpenAIResponse(
       try {
         const response = (await withTimeout(
           () => client.responses.create(payload),
-          timeoutMs
+          timeoutMs,
         )) as unknown as OpenAIResponse;
 
-        logInfo('openai.request.success', {
+        logInfo("openai.request.success", {
           request_id: requestId,
-          response_id: response.id ?? 'unknown',
+          response_id: response.id ?? "unknown",
         });
 
         return response;
@@ -109,12 +113,12 @@ export async function callOpenAIResponse(
         continue;
       }
 
-      logWarn('openai.request.error', {
+      logWarn("openai.request.error", {
         request_id: requestId,
         error: error instanceof Error ? error.message : String(error),
       });
 
-      throw new OpenAIClientError('OPENAI_ERROR', 'OpenAI request failed.', true);
+      throw new OpenAIClientError("OPENAI_ERROR", "OpenAI request failed.", true);
     }
   }
 }
@@ -132,7 +136,7 @@ async function withTimeout<T>(fn: () => Promise<T>, timeoutMs: number): Promise<
     ]);
   } catch (error) {
     if (error instanceof TimeoutError) {
-      throw new OpenAIClientError('OPENAI_TIMEOUT', 'OpenAI request timed out.', true);
+      throw new OpenAIClientError("OPENAI_TIMEOUT", "OpenAI request timed out.", true);
     }
     throw error;
   } finally {
@@ -148,7 +152,7 @@ function sleepWithBackoff(attempt: number): Promise<void> {
 }
 
 function getMaxConcurrentRequests(): number {
-  const value = Number.parseInt(process.env.MAX_CONCURRENT_OPENAI_REQUESTS ?? '4', 10);
+  const value = Number.parseInt(process.env.MAX_CONCURRENT_OPENAI_REQUESTS ?? "4", 10);
   if (!Number.isFinite(value) || value <= 0) {
     return 4;
   }
@@ -161,17 +165,13 @@ async function acquireConcurrencySlot(requestId: string): Promise<void> {
     return;
   }
 
-  logMetric('openai.concurrency_blocked', {
+  logMetric("openai.concurrency_blocked", {
     request_id: requestId,
     in_flight: inFlightRequests,
     max: MAX_CONCURRENT_REQUESTS,
   });
 
-  throw new OpenAIClientError(
-    'OPENAI_ERROR',
-    'OpenAI concurrency limit reached.',
-    true,
-  );
+  throw new OpenAIClientError("OPENAI_ERROR", "OpenAI concurrency limit reached.", true);
 }
 
 function releaseConcurrencySlot(): void {

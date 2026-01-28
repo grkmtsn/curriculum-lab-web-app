@@ -1,7 +1,7 @@
-import { z } from 'zod';
-import crypto from 'node:crypto';
-import { createPilotToken } from '../db/repo';
-import { hashPilotToken } from '../utils/hash';
+import crypto from "node:crypto";
+import { z } from "zod";
+import { createPilotToken } from "../db/repo";
+import { hashPilotToken } from "../utils/hash";
 
 const createPilotTokenSchema = z
   .object({
@@ -18,7 +18,7 @@ export type CreatePilotTokenResponse =
     }
   | {
       error: {
-        code: 'REQUEST_INVALID' | 'UNKNOWN_ERROR';
+        code: "REQUEST_INVALID" | "UNKNOWN_ERROR";
         message: string;
         retryable: boolean;
       };
@@ -50,8 +50,9 @@ export async function createPilotTokenHandler(
     if (error instanceof z.ZodError) {
       return {
         error: {
-          code: 'REQUEST_INVALID',
-          message: error.issues.map((issue) => issue.message).join(' ') || 'Invalid request.',
+          code: "REQUEST_INVALID",
+          message:
+            error.issues.map((issue) => issue.message).join(" ") || "Invalid request.",
           retryable: false,
         },
       };
@@ -59,8 +60,8 @@ export async function createPilotTokenHandler(
 
     return {
       error: {
-        code: 'UNKNOWN_ERROR',
-        message: 'Unexpected error while creating pilot token.',
+        code: "UNKNOWN_ERROR",
+        message: "Unexpected error while creating pilot token.",
         retryable: false,
       },
     };
@@ -69,6 +70,6 @@ export async function createPilotTokenHandler(
 
 function generatePilotToken(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(32));
-  const raw = Buffer.from(bytes).toString('base64');
-  return raw.replace(/=+$/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+  const raw = Buffer.from(bytes).toString("base64");
+  return raw.replace(/=+$/g, "").replace(/\+/g, "-").replace(/\//g, "_");
 }

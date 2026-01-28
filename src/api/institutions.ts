@@ -1,10 +1,10 @@
-import { z } from 'zod';
-import { createInstitution } from '../db/repo';
+import { z } from "zod";
+import { createInstitution } from "../db/repo";
 
 export const createInstitutionSchema = z
   .object({
     name: z.string().trim().min(1).max(120).optional(),
-    city: z.string().trim().min(1).max(80).default('Bucharest'),
+    city: z.string().trim().min(1).max(80).default("Bucharest"),
   })
   .strict();
 
@@ -16,7 +16,7 @@ export type CreateInstitutionResponse =
     }
   | {
       error: {
-        code: 'REQUEST_INVALID' | 'UNKNOWN_ERROR';
+        code: "REQUEST_INVALID" | "UNKNOWN_ERROR";
         message: string;
         retryable: boolean;
       };
@@ -41,8 +41,9 @@ export async function createInstitutionHandler(
     if (error instanceof z.ZodError) {
       return {
         error: {
-          code: 'REQUEST_INVALID',
-          message: error.issues.map((issue) => issue.message).join(' ') || 'Invalid request.',
+          code: "REQUEST_INVALID",
+          message:
+            error.issues.map((issue) => issue.message).join(" ") || "Invalid request.",
           retryable: false,
         },
       };
@@ -50,8 +51,8 @@ export async function createInstitutionHandler(
 
     return {
       error: {
-        code: 'UNKNOWN_ERROR',
-        message: 'Unexpected error while creating institution.',
+        code: "UNKNOWN_ERROR",
+        message: "Unexpected error while creating institution.",
         retryable: false,
       },
     };

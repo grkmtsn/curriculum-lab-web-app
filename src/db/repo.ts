@@ -1,6 +1,6 @@
-﻿import { prisma } from '../../prisma/prisma';
-import { Prisma } from '../../prisma/generated/client';
-import { todayKeyUtc } from '../utils/time';
+﻿import { Prisma } from "../../prisma/generated/client";
+import { prisma } from "../../prisma/prisma";
+import { todayKeyUtc } from "../utils/time";
 
 export type PilotTokenRecord = {
   tokenHash: string;

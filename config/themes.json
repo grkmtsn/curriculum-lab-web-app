@@ -34,14 +34,7 @@
       "sorting game",
       "mini engineering challenge"
     ],
-    "materials_pool": [
-      "cups",
-      "water",
-      "tape",
-      "paper straws",
-      "blocks",
-      "spoons"
-    ]
+    "materials_pool": ["cups", "water", "tape", "paper straws", "blocks", "spoons"]
   },
   "ARTS": {
     "label": "Arts & Creativity",
@@ -99,13 +92,7 @@
       "relay",
       "yoga for kids"
     ],
-    "materials_pool": [
-      "cones",
-      "tape lines on floor",
-      "soft balls",
-      "hoops",
-      "music"
-    ]
+    "materials_pool": ["cones", "tape lines on floor", "soft balls", "hoops", "music"]
   },
   "SENSORY": {
     "label": "Sensory & Exploration",

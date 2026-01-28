@@ -1,5 +1,5 @@
-﻿import { RATE_LIMIT_PER_DAY } from '../utils/time';
-import { incrementDailyRateLimit } from '../db/repo';
+﻿import { incrementDailyRateLimit } from "../db/repo";
+import { RATE_LIMIT_PER_DAY } from "../utils/time";
 
 export type RateLimitResult = {
   remaining: number;
@@ -8,12 +8,12 @@ export type RateLimitResult = {
 };
 
 export class RateLimitError extends Error {
-  public readonly code: 'RATE_LIMITED';
+  public readonly code: "RATE_LIMITED";
   public readonly retryable: boolean;
 
   constructor(message: string) {
     super(message);
-    this.code = 'RATE_LIMITED';
+    this.code = "RATE_LIMITED";
     this.retryable = true;
   }
 }
@@ -23,7 +23,7 @@ export async function enforceRateLimit(institutionId: string): Promise<RateLimit
   const { count } = await incrementDailyRateLimit(institutionId);
 
   if (count > limit) {
-    throw new RateLimitError('Daily generation limit reached for this pilot token.');
+    throw new RateLimitError("Daily generation limit reached for this pilot token.");
   }
 
   return {
