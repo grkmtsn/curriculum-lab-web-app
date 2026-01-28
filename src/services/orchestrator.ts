@@ -109,6 +109,7 @@ async function generateStage1Outline(
       const response = await callOpenAIResponse({
         requestId,
         model: process.env.OPENAI_MODEL_STAGE1 ?? 'gpt-4.1',
+        maxOutputTokens: getMaxOutputTokensStage1(),
         input: [
           {
             role: 'system',
@@ -206,6 +207,7 @@ async function generateStage2Final(
       const response = await callOpenAIResponse({
         requestId,
         model: process.env.OPENAI_MODEL_STAGE2 ?? 'gpt-4.1',
+        maxOutputTokens: getMaxOutputTokensStage2(),
         input: [
           {
             role: 'system',
@@ -320,7 +322,7 @@ function getMaxRetryStage1(): number {
   if (!Number.isFinite(value) || value < 0) {
     return 2;
   }
-  return value;
+  return Math.min(value, 2);
 }
 
 function getMaxRetryStage2(): number {
@@ -328,13 +330,29 @@ function getMaxRetryStage2(): number {
   if (!Number.isFinite(value) || value < 0) {
     return 1;
   }
-  return value;
+  return Math.min(value, 1);
 }
 
 function getNoveltyThreshold(): number {
   const value = Number.parseFloat(process.env.NOVELTY_THRESHOLD ?? '0.6');
   if (!Number.isFinite(value) || value <= 0) {
     return 0.6;
+  }
+  return value;
+}
+
+function getMaxOutputTokensStage1(): number {
+  const value = Number.parseInt(process.env.MAX_OUTPUT_TOKENS_STAGE1 ?? '800', 10);
+  if (!Number.isFinite(value) || value <= 0) {
+    return 800;
+  }
+  return value;
+}
+
+function getMaxOutputTokensStage2(): number {
+  const value = Number.parseInt(process.env.MAX_OUTPUT_TOKENS_STAGE2 ?? '1200', 10);
+  if (!Number.isFinite(value) || value <= 0) {
+    return 1200;
   }
   return value;
 }
