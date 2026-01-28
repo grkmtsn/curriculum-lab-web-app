@@ -386,7 +386,8 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   Institution: 'Institution',
   PilotToken: 'PilotToken',
-  RateLimit: 'RateLimit'
+  RateLimit: 'RateLimit',
+  Generation: 'Generation'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -402,7 +403,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "institution" | "pilotToken" | "rateLimit"
+    modelProps: "institution" | "pilotToken" | "rateLimit" | "generation"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -628,6 +629,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    Generation: {
+      payload: Prisma.$GenerationPayload<ExtArgs>
+      fields: Prisma.GenerationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.GenerationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.GenerationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationPayload>
+        }
+        findFirst: {
+          args: Prisma.GenerationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.GenerationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationPayload>
+        }
+        findMany: {
+          args: Prisma.GenerationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationPayload>[]
+        }
+        create: {
+          args: Prisma.GenerationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationPayload>
+        }
+        createMany: {
+          args: Prisma.GenerationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.GenerationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationPayload>[]
+        }
+        delete: {
+          args: Prisma.GenerationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationPayload>
+        }
+        update: {
+          args: Prisma.GenerationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationPayload>
+        }
+        deleteMany: {
+          args: Prisma.GenerationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.GenerationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.GenerationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationPayload>[]
+        }
+        upsert: {
+          args: Prisma.GenerationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$GenerationPayload>
+        }
+        aggregate: {
+          args: Prisma.GenerationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGeneration>
+        }
+        groupBy: {
+          args: Prisma.GenerationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GenerationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.GenerationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.GenerationCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -697,12 +772,36 @@ export const RateLimitScalarFieldEnum = {
 export type RateLimitScalarFieldEnum = (typeof RateLimitScalarFieldEnum)[keyof typeof RateLimitScalarFieldEnum]
 
 
+export const GenerationScalarFieldEnum = {
+  id: 'id',
+  institutionId: 'institutionId',
+  createdAt: 'createdAt',
+  requestPayload: 'requestPayload',
+  outlineJson: 'outlineJson',
+  finalJson: 'finalJson',
+  validationPass: 'validationPass',
+  latencyMs: 'latencyMs',
+  modelName: 'modelName',
+  regenerateFlag: 'regenerateFlag',
+  errorCode: 'errorCode'
+} as const
+
+export type GenerationScalarFieldEnum = (typeof GenerationScalarFieldEnum)[keyof typeof GenerationScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -719,6 +818,15 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
 
@@ -766,6 +874,27 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
  * Reference to a field of type 'Int[]'
  */
 export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Json'
+ */
+export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+/**
+ * Reference to a field of type 'QueryMode'
+ */
+export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -880,6 +1009,7 @@ export type GlobalOmitConfig = {
   institution?: Prisma.InstitutionOmit
   pilotToken?: Prisma.PilotTokenOmit
   rateLimit?: Prisma.RateLimitOmit
+  generation?: Prisma.GenerationOmit
 }
 
 /* Types for Logging */

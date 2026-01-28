@@ -53,7 +53,8 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Institution: 'Institution',
   PilotToken: 'PilotToken',
-  RateLimit: 'RateLimit'
+  RateLimit: 'RateLimit',
+  Generation: 'Generation'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -102,12 +103,36 @@ export const RateLimitScalarFieldEnum = {
 export type RateLimitScalarFieldEnum = (typeof RateLimitScalarFieldEnum)[keyof typeof RateLimitScalarFieldEnum]
 
 
+export const GenerationScalarFieldEnum = {
+  id: 'id',
+  institutionId: 'institutionId',
+  createdAt: 'createdAt',
+  requestPayload: 'requestPayload',
+  outlineJson: 'outlineJson',
+  finalJson: 'finalJson',
+  validationPass: 'validationPass',
+  latencyMs: 'latencyMs',
+  modelName: 'modelName',
+  regenerateFlag: 'regenerateFlag',
+  errorCode: 'errorCode'
+} as const
+
+export type GenerationScalarFieldEnum = (typeof GenerationScalarFieldEnum)[keyof typeof GenerationScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -124,4 +149,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

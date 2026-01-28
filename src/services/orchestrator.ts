@@ -3,7 +3,7 @@ import type { AppConfig } from '../config/loader';
 import type { GenerateRequest } from '../middleware/validateRequest';
 import { buildStage1Prompt, buildStage2Prompt } from './promptBuilder';
 import { callOpenAIResponse, OpenAIClientError } from './openaiClient';
-import { validateFinalActivity, validateOutline, type FinalActivity } from './validators';
+import { validateFinalActivity, validateOutline, type FinalActivity, type Outline } from './validators';
 import { checkNovelty } from './novelty';
 import { logMetric } from '../utils/logger';
 
@@ -15,7 +15,10 @@ export type OrchestratorInput = {
   requestId?: string;
 };
 
-export type OrchestratorResult = FinalActivity['activity'];
+export type OrchestratorResult = {
+  activity: FinalActivity['activity'];
+  outline: Outline;
+};
 
 export class OrchestratorError extends Error {
   public readonly code:
@@ -84,7 +87,10 @@ export async function orchestrateActivity(
       }
     }
 
-    return finalActivity;
+    return {
+      activity: finalActivity,
+      outline,
+    };
   }
 }
 

@@ -7,12 +7,15 @@ import {
   RequestValidationError,
   validateGenerateRequest,
 } from '../middleware/validateRequest';
-import { orchestrateActivity, OrchestratorError, type OrchestratorResult } from '../services/orchestrator';
+import { orchestrateActivity, OrchestratorError } from '../services/orchestrator';
+import type { FinalActivity } from '../services/validators';
 import { logInfo, logMetric, logWarn } from '../utils/logger';
+import { createGeneration } from '../db/repo';
+import { Prisma } from '../../prisma/generated/client';
 
 export type GenerateActivitySuccess = {
   schema_version: typeof ACTIVITY_SCHEMA_VERSION;
-  activity: OrchestratorResult;
+  activity: FinalActivity['activity'];
 };
 
 export type GenerateActivityError = {
@@ -44,28 +47,52 @@ export async function generateActivity(
   const startedAt = Date.now();
   logInfo('request.start', { request_id: requestId, path: '/api/generate-activity' });
 
+  let requestPayload: ReturnType<typeof validateGenerateRequest> | null = null;
+  let institutionId: string | null = null;
+  let outlineJson: Prisma.JsonValue | null = null;
+  let finalJson: Prisma.JsonValue | null = null;
+
   try {
     const request = validateGenerateRequest(input);
+    requestPayload = request;
     const authResult = await verifyPilotToken(request.pilot_token);
+    institutionId = authResult.institutionId;
 
     await enforceRateLimit(authResult.institutionId);
 
     const config = loadConfig();
-    const activity = await orchestrateActivity({
+    const result = await orchestrateActivity({
       request,
       institutionId: authResult.institutionId,
       config,
       requestId,
     });
 
+    finalJson = result.activity;
+    outlineJson = result.outline;
+
     logMetric('request.success', {
       request_id: requestId,
       latency_ms: Date.now() - startedAt,
     });
 
+    if (requestPayload && institutionId) {
+      await createGeneration({
+        institutionId,
+        requestPayload,
+        outlineJson,
+        finalJson,
+        validationPass: true,
+        latencyMs: Date.now() - startedAt,
+        modelName: process.env.OPENAI_MODEL_STAGE2 ?? process.env.OPENAI_MODEL_STAGE1 ?? null,
+        regenerateFlag: request.regenerate ?? false,
+        errorCode: null,
+      });
+    }
+
     return {
       schema_version: ACTIVITY_SCHEMA_VERSION,
-      activity,
+      activity: result.activity,
     };
   } catch (error) {
     if (error instanceof RateLimitError) {
@@ -93,6 +120,20 @@ export async function generateActivity(
       code: mapped.error.code,
       latency_ms: Date.now() - startedAt,
     });
+
+    if (requestPayload && institutionId) {
+      await createGeneration({
+        institutionId,
+        requestPayload,
+        outlineJson,
+        finalJson,
+        validationPass: false,
+        latencyMs: Date.now() - startedAt,
+        modelName: process.env.OPENAI_MODEL_STAGE2 ?? process.env.OPENAI_MODEL_STAGE1 ?? null,
+        regenerateFlag: requestPayload.regenerate ?? false,
+        errorCode: mapped.error.code,
+      });
+    }
 
     return mapped;
   }

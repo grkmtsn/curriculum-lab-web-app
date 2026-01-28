@@ -1,4 +1,5 @@
 ﻿import { prisma } from '../../prisma/prisma';
+import { Prisma } from '../../prisma/generated/client';
 import { todayKeyUtc } from '../utils/time';
 
 export type PilotTokenRecord = {
@@ -125,5 +126,63 @@ export async function createPilotToken(
     expiresAt: record.expiresAt,
     revokedAt: record.revokedAt,
     createdAt: record.createdAt,
+  };
+}
+
+export type CreateGenerationInput = {
+  institutionId: string;
+  requestPayload: Prisma.InputJsonValue;
+  outlineJson: Prisma.InputJsonValue | null;
+  finalJson: Prisma.InputJsonValue | null;
+  validationPass: boolean;
+  latencyMs?: number | null;
+  modelName?: string | null;
+  regenerateFlag: boolean;
+  errorCode?: string | null;
+};
+
+export type GenerationRecord = {
+  id: string;
+  institutionId: string;
+  createdAt: Date;
+  requestPayload: Prisma.JsonValue;
+  outlineJson: Prisma.JsonValue | null;
+  finalJson: Prisma.JsonValue | null;
+  validationPass: boolean;
+  latencyMs: number | null;
+  modelName: string | null;
+  regenerateFlag: boolean;
+  errorCode: string | null;
+};
+
+export async function createGeneration(
+  input: CreateGenerationInput,
+): Promise<GenerationRecord> {
+  const record = await prisma.generation.create({
+    data: {
+      institutionId: input.institutionId,
+      requestPayload: input.requestPayload,
+      outlineJson: input.outlineJson ?? Prisma.JsonNull,
+      finalJson: input.finalJson ?? Prisma.JsonNull,
+      validationPass: input.validationPass,
+      latencyMs: input.latencyMs ?? null,
+      modelName: input.modelName ?? null,
+      regenerateFlag: input.regenerateFlag,
+      errorCode: input.errorCode ?? null,
+    },
+  });
+
+  return {
+    id: record.id,
+    institutionId: record.institutionId,
+    createdAt: record.createdAt,
+    requestPayload: record.requestPayload,
+    outlineJson: record.outlineJson,
+    finalJson: record.finalJson,
+    validationPass: record.validationPass,
+    latencyMs: record.latencyMs,
+    modelName: record.modelName,
+    regenerateFlag: record.regenerateFlag,
+    errorCode: record.errorCode,
   };
 }

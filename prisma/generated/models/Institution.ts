@@ -176,6 +176,7 @@ export type InstitutionWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Institution"> | Date | string
   pilotTokens?: Prisma.PilotTokenListRelationFilter
   rateLimits?: Prisma.RateLimitListRelationFilter
+  generations?: Prisma.GenerationListRelationFilter
 }
 
 export type InstitutionOrderByWithRelationInput = {
@@ -185,6 +186,7 @@ export type InstitutionOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   pilotTokens?: Prisma.PilotTokenOrderByRelationAggregateInput
   rateLimits?: Prisma.RateLimitOrderByRelationAggregateInput
+  generations?: Prisma.GenerationOrderByRelationAggregateInput
 }
 
 export type InstitutionWhereUniqueInput = Prisma.AtLeast<{
@@ -197,6 +199,7 @@ export type InstitutionWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Institution"> | Date | string
   pilotTokens?: Prisma.PilotTokenListRelationFilter
   rateLimits?: Prisma.RateLimitListRelationFilter
+  generations?: Prisma.GenerationListRelationFilter
 }, "id">
 
 export type InstitutionOrderByWithAggregationInput = {
@@ -226,6 +229,7 @@ export type InstitutionCreateInput = {
   createdAt?: Date | string
   pilotTokens?: Prisma.PilotTokenCreateNestedManyWithoutInstitutionInput
   rateLimits?: Prisma.RateLimitCreateNestedManyWithoutInstitutionInput
+  generations?: Prisma.GenerationCreateNestedManyWithoutInstitutionInput
 }
 
 export type InstitutionUncheckedCreateInput = {
@@ -235,6 +239,7 @@ export type InstitutionUncheckedCreateInput = {
   createdAt?: Date | string
   pilotTokens?: Prisma.PilotTokenUncheckedCreateNestedManyWithoutInstitutionInput
   rateLimits?: Prisma.RateLimitUncheckedCreateNestedManyWithoutInstitutionInput
+  generations?: Prisma.GenerationUncheckedCreateNestedManyWithoutInstitutionInput
 }
 
 export type InstitutionUpdateInput = {
@@ -244,6 +249,7 @@ export type InstitutionUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pilotTokens?: Prisma.PilotTokenUpdateManyWithoutInstitutionNestedInput
   rateLimits?: Prisma.RateLimitUpdateManyWithoutInstitutionNestedInput
+  generations?: Prisma.GenerationUpdateManyWithoutInstitutionNestedInput
 }
 
 export type InstitutionUncheckedUpdateInput = {
@@ -253,6 +259,7 @@ export type InstitutionUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pilotTokens?: Prisma.PilotTokenUncheckedUpdateManyWithoutInstitutionNestedInput
   rateLimits?: Prisma.RateLimitUncheckedUpdateManyWithoutInstitutionNestedInput
+  generations?: Prisma.GenerationUncheckedUpdateManyWithoutInstitutionNestedInput
 }
 
 export type InstitutionCreateManyInput = {
@@ -342,12 +349,27 @@ export type InstitutionUpdateOneRequiredWithoutRateLimitsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.InstitutionUpdateToOneWithWhereWithoutRateLimitsInput, Prisma.InstitutionUpdateWithoutRateLimitsInput>, Prisma.InstitutionUncheckedUpdateWithoutRateLimitsInput>
 }
 
+export type InstitutionCreateNestedOneWithoutGenerationsInput = {
+  create?: Prisma.XOR<Prisma.InstitutionCreateWithoutGenerationsInput, Prisma.InstitutionUncheckedCreateWithoutGenerationsInput>
+  connectOrCreate?: Prisma.InstitutionCreateOrConnectWithoutGenerationsInput
+  connect?: Prisma.InstitutionWhereUniqueInput
+}
+
+export type InstitutionUpdateOneRequiredWithoutGenerationsNestedInput = {
+  create?: Prisma.XOR<Prisma.InstitutionCreateWithoutGenerationsInput, Prisma.InstitutionUncheckedCreateWithoutGenerationsInput>
+  connectOrCreate?: Prisma.InstitutionCreateOrConnectWithoutGenerationsInput
+  upsert?: Prisma.InstitutionUpsertWithoutGenerationsInput
+  connect?: Prisma.InstitutionWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.InstitutionUpdateToOneWithWhereWithoutGenerationsInput, Prisma.InstitutionUpdateWithoutGenerationsInput>, Prisma.InstitutionUncheckedUpdateWithoutGenerationsInput>
+}
+
 export type InstitutionCreateWithoutPilotTokensInput = {
   id?: string
   name?: string | null
   city: string
   createdAt?: Date | string
   rateLimits?: Prisma.RateLimitCreateNestedManyWithoutInstitutionInput
+  generations?: Prisma.GenerationCreateNestedManyWithoutInstitutionInput
 }
 
 export type InstitutionUncheckedCreateWithoutPilotTokensInput = {
@@ -356,6 +378,7 @@ export type InstitutionUncheckedCreateWithoutPilotTokensInput = {
   city: string
   createdAt?: Date | string
   rateLimits?: Prisma.RateLimitUncheckedCreateNestedManyWithoutInstitutionInput
+  generations?: Prisma.GenerationUncheckedCreateNestedManyWithoutInstitutionInput
 }
 
 export type InstitutionCreateOrConnectWithoutPilotTokensInput = {
@@ -380,6 +403,7 @@ export type InstitutionUpdateWithoutPilotTokensInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rateLimits?: Prisma.RateLimitUpdateManyWithoutInstitutionNestedInput
+  generations?: Prisma.GenerationUpdateManyWithoutInstitutionNestedInput
 }
 
 export type InstitutionUncheckedUpdateWithoutPilotTokensInput = {
@@ -388,6 +412,7 @@ export type InstitutionUncheckedUpdateWithoutPilotTokensInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   rateLimits?: Prisma.RateLimitUncheckedUpdateManyWithoutInstitutionNestedInput
+  generations?: Prisma.GenerationUncheckedUpdateManyWithoutInstitutionNestedInput
 }
 
 export type InstitutionCreateWithoutRateLimitsInput = {
@@ -396,6 +421,7 @@ export type InstitutionCreateWithoutRateLimitsInput = {
   city: string
   createdAt?: Date | string
   pilotTokens?: Prisma.PilotTokenCreateNestedManyWithoutInstitutionInput
+  generations?: Prisma.GenerationCreateNestedManyWithoutInstitutionInput
 }
 
 export type InstitutionUncheckedCreateWithoutRateLimitsInput = {
@@ -404,6 +430,7 @@ export type InstitutionUncheckedCreateWithoutRateLimitsInput = {
   city: string
   createdAt?: Date | string
   pilotTokens?: Prisma.PilotTokenUncheckedCreateNestedManyWithoutInstitutionInput
+  generations?: Prisma.GenerationUncheckedCreateNestedManyWithoutInstitutionInput
 }
 
 export type InstitutionCreateOrConnectWithoutRateLimitsInput = {
@@ -428,6 +455,7 @@ export type InstitutionUpdateWithoutRateLimitsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pilotTokens?: Prisma.PilotTokenUpdateManyWithoutInstitutionNestedInput
+  generations?: Prisma.GenerationUpdateManyWithoutInstitutionNestedInput
 }
 
 export type InstitutionUncheckedUpdateWithoutRateLimitsInput = {
@@ -436,6 +464,59 @@ export type InstitutionUncheckedUpdateWithoutRateLimitsInput = {
   city?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   pilotTokens?: Prisma.PilotTokenUncheckedUpdateManyWithoutInstitutionNestedInput
+  generations?: Prisma.GenerationUncheckedUpdateManyWithoutInstitutionNestedInput
+}
+
+export type InstitutionCreateWithoutGenerationsInput = {
+  id?: string
+  name?: string | null
+  city: string
+  createdAt?: Date | string
+  pilotTokens?: Prisma.PilotTokenCreateNestedManyWithoutInstitutionInput
+  rateLimits?: Prisma.RateLimitCreateNestedManyWithoutInstitutionInput
+}
+
+export type InstitutionUncheckedCreateWithoutGenerationsInput = {
+  id?: string
+  name?: string | null
+  city: string
+  createdAt?: Date | string
+  pilotTokens?: Prisma.PilotTokenUncheckedCreateNestedManyWithoutInstitutionInput
+  rateLimits?: Prisma.RateLimitUncheckedCreateNestedManyWithoutInstitutionInput
+}
+
+export type InstitutionCreateOrConnectWithoutGenerationsInput = {
+  where: Prisma.InstitutionWhereUniqueInput
+  create: Prisma.XOR<Prisma.InstitutionCreateWithoutGenerationsInput, Prisma.InstitutionUncheckedCreateWithoutGenerationsInput>
+}
+
+export type InstitutionUpsertWithoutGenerationsInput = {
+  update: Prisma.XOR<Prisma.InstitutionUpdateWithoutGenerationsInput, Prisma.InstitutionUncheckedUpdateWithoutGenerationsInput>
+  create: Prisma.XOR<Prisma.InstitutionCreateWithoutGenerationsInput, Prisma.InstitutionUncheckedCreateWithoutGenerationsInput>
+  where?: Prisma.InstitutionWhereInput
+}
+
+export type InstitutionUpdateToOneWithWhereWithoutGenerationsInput = {
+  where?: Prisma.InstitutionWhereInput
+  data: Prisma.XOR<Prisma.InstitutionUpdateWithoutGenerationsInput, Prisma.InstitutionUncheckedUpdateWithoutGenerationsInput>
+}
+
+export type InstitutionUpdateWithoutGenerationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pilotTokens?: Prisma.PilotTokenUpdateManyWithoutInstitutionNestedInput
+  rateLimits?: Prisma.RateLimitUpdateManyWithoutInstitutionNestedInput
+}
+
+export type InstitutionUncheckedUpdateWithoutGenerationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  pilotTokens?: Prisma.PilotTokenUncheckedUpdateManyWithoutInstitutionNestedInput
+  rateLimits?: Prisma.RateLimitUncheckedUpdateManyWithoutInstitutionNestedInput
 }
 
 
@@ -446,11 +527,13 @@ export type InstitutionUncheckedUpdateWithoutRateLimitsInput = {
 export type InstitutionCountOutputType = {
   pilotTokens: number
   rateLimits: number
+  generations: number
 }
 
 export type InstitutionCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pilotTokens?: boolean | InstitutionCountOutputTypeCountPilotTokensArgs
   rateLimits?: boolean | InstitutionCountOutputTypeCountRateLimitsArgs
+  generations?: boolean | InstitutionCountOutputTypeCountGenerationsArgs
 }
 
 /**
@@ -477,6 +560,13 @@ export type InstitutionCountOutputTypeCountRateLimitsArgs<ExtArgs extends runtim
   where?: Prisma.RateLimitWhereInput
 }
 
+/**
+ * InstitutionCountOutputType without action
+ */
+export type InstitutionCountOutputTypeCountGenerationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.GenerationWhereInput
+}
+
 
 export type InstitutionSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -485,6 +575,7 @@ export type InstitutionSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   createdAt?: boolean
   pilotTokens?: boolean | Prisma.Institution$pilotTokensArgs<ExtArgs>
   rateLimits?: boolean | Prisma.Institution$rateLimitsArgs<ExtArgs>
+  generations?: boolean | Prisma.Institution$generationsArgs<ExtArgs>
   _count?: boolean | Prisma.InstitutionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["institution"]>
 
@@ -513,6 +604,7 @@ export type InstitutionOmit<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type InstitutionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   pilotTokens?: boolean | Prisma.Institution$pilotTokensArgs<ExtArgs>
   rateLimits?: boolean | Prisma.Institution$rateLimitsArgs<ExtArgs>
+  generations?: boolean | Prisma.Institution$generationsArgs<ExtArgs>
   _count?: boolean | Prisma.InstitutionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type InstitutionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -523,6 +615,7 @@ export type $InstitutionPayload<ExtArgs extends runtime.Types.Extensions.Interna
   objects: {
     pilotTokens: Prisma.$PilotTokenPayload<ExtArgs>[]
     rateLimits: Prisma.$RateLimitPayload<ExtArgs>[]
+    generations: Prisma.$GenerationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -925,6 +1018,7 @@ export interface Prisma__InstitutionClient<T, Null = never, ExtArgs extends runt
   readonly [Symbol.toStringTag]: "PrismaPromise"
   pilotTokens<T extends Prisma.Institution$pilotTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institution$pilotTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PilotTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   rateLimits<T extends Prisma.Institution$rateLimitsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institution$rateLimitsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RateLimitPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  generations<T extends Prisma.Institution$generationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Institution$generationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GenerationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1391,6 +1485,30 @@ export type Institution$rateLimitsArgs<ExtArgs extends runtime.Types.Extensions.
   take?: number
   skip?: number
   distinct?: Prisma.RateLimitScalarFieldEnum | Prisma.RateLimitScalarFieldEnum[]
+}
+
+/**
+ * Institution.generations
+ */
+export type Institution$generationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Generation
+   */
+  select?: Prisma.GenerationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Generation
+   */
+  omit?: Prisma.GenerationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.GenerationInclude<ExtArgs> | null
+  where?: Prisma.GenerationWhereInput
+  orderBy?: Prisma.GenerationOrderByWithRelationInput | Prisma.GenerationOrderByWithRelationInput[]
+  cursor?: Prisma.GenerationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.GenerationScalarFieldEnum | Prisma.GenerationScalarFieldEnum[]
 }
 
 /**

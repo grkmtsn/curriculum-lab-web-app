@@ -54,3 +54,8 @@ export type PilotToken = Prisma.PilotTokenModel
  * 
  */
 export type RateLimit = Prisma.RateLimitModel
+/**
+ * Model Generation
+ * 
+ */
+export type Generation = Prisma.GenerationModel
