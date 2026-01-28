@@ -20,7 +20,7 @@ const config: runtime.GetPrismaClientConfig = {
   "clientVersion": "7.3.0",
   "engineVersion": "9d6ad21cbbceab97458517b147a6a09ff43aa735",
   "activeProvider": "postgresql",
-  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"./generated\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Institution {\n  id          String       @id @default(uuid())\n  name        String?\n  city        String\n  createdAt   DateTime     @default(now())\n  pilotTokens PilotToken[]\n}\n\nmodel PilotToken {\n  tokenHash     String      @id\n  institutionId String\n  institution   Institution @relation(fields: [institutionId], references: [id])\n  expiresAt     DateTime\n  revokedAt     DateTime?\n  createdAt     DateTime    @default(now())\n}\n",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"./generated\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Institution {\n  id          String       @id @default(uuid())\n  name        String?\n  city        String\n  createdAt   DateTime     @default(now())\n  pilotTokens PilotToken[]\n  rateLimits  RateLimit[]\n}\n\nmodel PilotToken {\n  tokenHash     String      @id\n  institutionId String\n  institution   Institution @relation(fields: [institutionId], references: [id])\n  expiresAt     DateTime\n  revokedAt     DateTime?\n  createdAt     DateTime    @default(now())\n}\n\nmodel RateLimit {\n  institutionId String\n  institution   Institution @relation(fields: [institutionId], references: [id])\n  date          String\n  count         Int         @default(0)\n\n  @@id([institutionId, date])\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
@@ -28,7 +28,7 @@ const config: runtime.GetPrismaClientConfig = {
   }
 }
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"Institution\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"city\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"pilotTokens\",\"kind\":\"object\",\"type\":\"PilotToken\",\"relationName\":\"InstitutionToPilotToken\"}],\"dbName\":null},\"PilotToken\":{\"fields\":[{\"name\":\"tokenHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"institutionId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"institution\",\"kind\":\"object\",\"type\":\"Institution\",\"relationName\":\"InstitutionToPilotToken\"},{\"name\":\"expiresAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"revokedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"Institution\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"city\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"pilotTokens\",\"kind\":\"object\",\"type\":\"PilotToken\",\"relationName\":\"InstitutionToPilotToken\"},{\"name\":\"rateLimits\",\"kind\":\"object\",\"type\":\"RateLimit\",\"relationName\":\"InstitutionToRateLimit\"}],\"dbName\":null},\"PilotToken\":{\"fields\":[{\"name\":\"tokenHash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"institutionId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"institution\",\"kind\":\"object\",\"type\":\"Institution\",\"relationName\":\"InstitutionToPilotToken\"},{\"name\":\"expiresAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"revokedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"RateLimit\":{\"fields\":[{\"name\":\"institutionId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"institution\",\"kind\":\"object\",\"type\":\"Institution\",\"relationName\":\"InstitutionToRateLimit\"},{\"name\":\"date\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"count\",\"kind\":\"scalar\",\"type\":\"Int\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 
 async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Module> {
   const { Buffer } = await import('node:buffer')
@@ -195,6 +195,16 @@ export interface PrismaClient<
     * ```
     */
   get pilotToken(): Prisma.PilotTokenDelegate<ExtArgs, { omit: OmitOpts }>;
+
+  /**
+   * `prisma.rateLimit`: Exposes CRUD operations for the **RateLimit** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more RateLimits
+    * const rateLimits = await prisma.rateLimit.findMany()
+    * ```
+    */
+  get rateLimit(): Prisma.RateLimitDelegate<ExtArgs, { omit: OmitOpts }>;
 }
 
 export function getPrismaClientClass(): PrismaClientConstructor {

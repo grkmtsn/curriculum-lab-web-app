@@ -10,4 +10,5 @@
  */
 export type * from './models/Institution'
 export type * from './models/PilotToken'
+export type * from './models/RateLimit'
 export type * from './commonInputTypes'

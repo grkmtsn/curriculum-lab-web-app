@@ -8,11 +8,12 @@ datasource db {
 }
 
 model Institution {
-  id         String      @id @default(uuid())
-  name       String?
-  city       String
-  createdAt  DateTime    @default(now())
+  id          String       @id @default(uuid())
+  name        String?
+  city        String
+  createdAt   DateTime     @default(now())
   pilotTokens PilotToken[]
+  rateLimits  RateLimit[]
 }
 
 model PilotToken {
@@ -22,4 +23,13 @@ model PilotToken {
   expiresAt     DateTime
   revokedAt     DateTime?
   createdAt     DateTime    @default(now())
+}
+
+model RateLimit {
+  institutionId String
+  institution   Institution @relation(fields: [institutionId], references: [id])
+  date          String
+  count         Int         @default(0)
+
+  @@id([institutionId, date])
 }

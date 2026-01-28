@@ -27,3 +27,8 @@ export type Institution = Prisma.InstitutionModel
  * 
  */
 export type PilotToken = Prisma.PilotTokenModel
+/**
+ * Model RateLimit
+ * 
+ */
+export type RateLimit = Prisma.RateLimitModel

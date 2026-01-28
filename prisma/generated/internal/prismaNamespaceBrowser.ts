@@ -52,7 +52,8 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   Institution: 'Institution',
-  PilotToken: 'PilotToken'
+  PilotToken: 'PilotToken',
+  RateLimit: 'RateLimit'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -90,6 +91,15 @@ export const PilotTokenScalarFieldEnum = {
 } as const
 
 export type PilotTokenScalarFieldEnum = (typeof PilotTokenScalarFieldEnum)[keyof typeof PilotTokenScalarFieldEnum]
+
+
+export const RateLimitScalarFieldEnum = {
+  institutionId: 'institutionId',
+  date: 'date',
+  count: 'count'
+} as const
+
+export type RateLimitScalarFieldEnum = (typeof RateLimitScalarFieldEnum)[keyof typeof RateLimitScalarFieldEnum]
 
 
 export const SortOrder = {
