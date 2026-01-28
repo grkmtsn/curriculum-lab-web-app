@@ -14,6 +14,7 @@ model Institution {
   createdAt   DateTime     @default(now())
   pilotTokens PilotToken[]
   rateLimits  RateLimit[]
+  generations Generation[]
 }
 
 model PilotToken {
@@ -32,4 +33,19 @@ model RateLimit {
   count         Int         @default(0)
 
   @@id([institutionId, date])
+}
+
+model Generation {
+  id             String      @id @default(uuid())
+  institutionId  String
+  institution    Institution @relation(fields: [institutionId], references: [id])
+  createdAt      DateTime    @default(now())
+  requestPayload Json
+  outlineJson    Json
+  finalJson      Json
+  validationPass Boolean     @default(false)
+  latencyMs      Int?
+  modelName      String?
+  regenerateFlag Boolean     @default(false)
+  errorCode      String?
 }
