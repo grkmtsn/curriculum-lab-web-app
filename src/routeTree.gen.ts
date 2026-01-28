@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiPilotTokensRouteImport } from './routes/api/pilot-tokens'
 import { Route as ApiInstitutionsRouteImport } from './routes/api/institutions'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as ApiGenerateActivityRouteImport } from './routes/api/generate-activity'
@@ -17,6 +18,11 @@ import { Route as ApiGenerateActivityRouteImport } from './routes/api/generate-a
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPilotTokensRoute = ApiPilotTokensRouteImport.update({
+  id: '/api/pilot-tokens',
+  path: '/api/pilot-tokens',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiInstitutionsRoute = ApiInstitutionsRouteImport.update({
@@ -40,12 +46,14 @@ export interface FileRoutesByFullPath {
   '/api/generate-activity': typeof ApiGenerateActivityRoute
   '/api/health': typeof ApiHealthRoute
   '/api/institutions': typeof ApiInstitutionsRoute
+  '/api/pilot-tokens': typeof ApiPilotTokensRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/generate-activity': typeof ApiGenerateActivityRoute
   '/api/health': typeof ApiHealthRoute
   '/api/institutions': typeof ApiInstitutionsRoute
+  '/api/pilot-tokens': typeof ApiPilotTokensRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,6 +61,7 @@ export interface FileRoutesById {
   '/api/generate-activity': typeof ApiGenerateActivityRoute
   '/api/health': typeof ApiHealthRoute
   '/api/institutions': typeof ApiInstitutionsRoute
+  '/api/pilot-tokens': typeof ApiPilotTokensRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -61,14 +70,21 @@ export interface FileRouteTypes {
     | '/api/generate-activity'
     | '/api/health'
     | '/api/institutions'
+    | '/api/pilot-tokens'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/generate-activity' | '/api/health' | '/api/institutions'
+  to:
+    | '/'
+    | '/api/generate-activity'
+    | '/api/health'
+    | '/api/institutions'
+    | '/api/pilot-tokens'
   id:
     | '__root__'
     | '/'
     | '/api/generate-activity'
     | '/api/health'
     | '/api/institutions'
+    | '/api/pilot-tokens'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,6 +92,7 @@ export interface RootRouteChildren {
   ApiGenerateActivityRoute: typeof ApiGenerateActivityRoute
   ApiHealthRoute: typeof ApiHealthRoute
   ApiInstitutionsRoute: typeof ApiInstitutionsRoute
+  ApiPilotTokensRoute: typeof ApiPilotTokensRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -85,6 +102,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/pilot-tokens': {
+      id: '/api/pilot-tokens'
+      path: '/api/pilot-tokens'
+      fullPath: '/api/pilot-tokens'
+      preLoaderRoute: typeof ApiPilotTokensRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/institutions': {
@@ -116,6 +140,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiGenerateActivityRoute: ApiGenerateActivityRoute,
   ApiHealthRoute: ApiHealthRoute,
   ApiInstitutionsRoute: ApiInstitutionsRoute,
+  ApiPilotTokensRoute: ApiPilotTokensRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

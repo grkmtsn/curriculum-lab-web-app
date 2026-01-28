@@ -93,3 +93,37 @@ export async function createInstitution(
     createdAt: record.createdAt,
   };
 }
+
+export type CreatePilotTokenInput = {
+  tokenHash: string;
+  institutionId: string;
+  expiresAt: Date;
+};
+
+export type PilotTokenCreateResult = {
+  tokenHash: string;
+  institutionId: string;
+  expiresAt: Date;
+  revokedAt: Date | null;
+  createdAt: Date;
+};
+
+export async function createPilotToken(
+  input: CreatePilotTokenInput,
+): Promise<PilotTokenCreateResult> {
+  const record = await prisma.pilotToken.create({
+    data: {
+      tokenHash: input.tokenHash,
+      institutionId: input.institutionId,
+      expiresAt: input.expiresAt,
+    },
+  });
+
+  return {
+    tokenHash: record.tokenHash,
+    institutionId: record.institutionId,
+    expiresAt: record.expiresAt,
+    revokedAt: record.revokedAt,
+    createdAt: record.createdAt,
+  };
+}
