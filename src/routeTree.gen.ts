@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiInstitutionsRouteImport } from './routes/api/institutions'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as ApiGenerateActivityRouteImport } from './routes/api/generate-activity'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiInstitutionsRoute = ApiInstitutionsRouteImport.update({
+  id: '/api/institutions',
+  path: '/api/institutions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiHealthRoute = ApiHealthRouteImport.update({
@@ -33,30 +39,43 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/api/generate-activity': typeof ApiGenerateActivityRoute
   '/api/health': typeof ApiHealthRoute
+  '/api/institutions': typeof ApiInstitutionsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/api/generate-activity': typeof ApiGenerateActivityRoute
   '/api/health': typeof ApiHealthRoute
+  '/api/institutions': typeof ApiInstitutionsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/api/generate-activity': typeof ApiGenerateActivityRoute
   '/api/health': typeof ApiHealthRoute
+  '/api/institutions': typeof ApiInstitutionsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/generate-activity' | '/api/health'
+  fullPaths:
+    | '/'
+    | '/api/generate-activity'
+    | '/api/health'
+    | '/api/institutions'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/generate-activity' | '/api/health'
-  id: '__root__' | '/' | '/api/generate-activity' | '/api/health'
+  to: '/' | '/api/generate-activity' | '/api/health' | '/api/institutions'
+  id:
+    | '__root__'
+    | '/'
+    | '/api/generate-activity'
+    | '/api/health'
+    | '/api/institutions'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ApiGenerateActivityRoute: typeof ApiGenerateActivityRoute
   ApiHealthRoute: typeof ApiHealthRoute
+  ApiInstitutionsRoute: typeof ApiInstitutionsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -66,6 +85,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/institutions': {
+      id: '/api/institutions'
+      path: '/api/institutions'
+      fullPath: '/api/institutions'
+      preLoaderRoute: typeof ApiInstitutionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/health': {
@@ -89,6 +115,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ApiGenerateActivityRoute: ApiGenerateActivityRoute,
   ApiHealthRoute: ApiHealthRoute,
+  ApiInstitutionsRoute: ApiInstitutionsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

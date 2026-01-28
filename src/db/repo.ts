@@ -63,3 +63,33 @@ export async function incrementDailyRateLimit(
     count: record.count,
   };
 }
+
+export type CreateInstitutionInput = {
+  name?: string | null;
+  city: string;
+};
+
+export type InstitutionRecord = {
+  id: string;
+  name: string | null;
+  city: string;
+  createdAt: Date;
+};
+
+export async function createInstitution(
+  input: CreateInstitutionInput,
+): Promise<InstitutionRecord> {
+  const record = await prisma.institution.create({
+    data: {
+      name: input.name ?? null,
+      city: input.city,
+    },
+  });
+
+  return {
+    id: record.id,
+    name: record.name,
+    city: record.city,
+    createdAt: record.createdAt,
+  };
+}
