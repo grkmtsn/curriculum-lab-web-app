@@ -1,12 +1,22 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router';
 import { randomUUID } from 'node:crypto';
 import type { GenerateActivityResponse } from '../../api/generateActivity';
 import { generateActivity } from '../../api/generateActivity';
 import { logInfo } from '../../utils/logger';
+import { getCorsHeaders, getSecurityHeaders } from '../../utils/http';
 
 export const Route = createFileRoute('/api/generate-activity')({
   server: {
     handlers: {
+      OPTIONS: async ({ request }) => {
+        return new Response(null, {
+          status: 204,
+          headers: {
+            ...getSecurityHeaders(),
+            ...getCorsHeaders(request),
+          },
+        });
+      },
       POST: async ({ request }) => {
         const requestId = randomUUID();
         let payload: unknown;
@@ -22,7 +32,7 @@ export const Route = createFileRoute('/api/generate-activity')({
             },
           };
 
-          return jsonResponse(errorResponse, 400, requestId);
+          return jsonResponse(errorResponse, 400, requestId, request);
         }
 
         logInfo('request.received', {
@@ -31,10 +41,10 @@ export const Route = createFileRoute('/api/generate-activity')({
         });
 
         const result = await generateActivity(payload, requestId);
-        return jsonResponse(result, statusFromResult(result), requestId);
+        return jsonResponse(result, statusFromResult(result), requestId, request);
       },
-    }
-  }
+    },
+  },
 });
 
 function statusFromResult(result: GenerateActivityResponse): number {
@@ -63,12 +73,19 @@ function statusFromResult(result: GenerateActivityResponse): number {
   }
 }
 
-function jsonResponse(body: GenerateActivityResponse, status: number, requestId: string): Response {
+function jsonResponse(
+  body: GenerateActivityResponse,
+  status: number,
+  requestId: string,
+  request: Request,
+): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       'content-type': 'application/json',
       'x-request-id': requestId,
+      ...getSecurityHeaders(),
+      ...getCorsHeaders(request),
     },
   });
 }

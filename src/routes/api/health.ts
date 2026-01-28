@@ -1,12 +1,22 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router';
 import { randomUUID } from 'node:crypto';
 import { health } from '../../api/health';
 import { logInfo } from '../../utils/logger';
+import { getCorsHeaders, getSecurityHeaders } from '../../utils/http';
 
 export const Route = createFileRoute('/api/health')({
   server: {
     handlers: {
-      GET: () => {
+      OPTIONS: async ({ request }) => {
+        return new Response(null, {
+          status: 204,
+          headers: {
+            ...getSecurityHeaders(),
+            ...getCorsHeaders(request),
+          },
+        });
+      },
+      GET: ({ request }) => {
         const requestId = randomUUID();
         logInfo('request.received', { request_id: requestId, path: '/api/health' });
 
@@ -16,6 +26,8 @@ export const Route = createFileRoute('/api/health')({
           headers: {
             'content-type': 'application/json',
             'x-request-id': requestId,
+            ...getSecurityHeaders(),
+            ...getCorsHeaders(request),
           },
         });
       },

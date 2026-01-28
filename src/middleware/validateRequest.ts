@@ -12,7 +12,9 @@ const CURRICULUM_STYLES = [
 const DURATION_OPTIONS = [30, 45, 60] as const;
 const GROUP_SIZE_MIN = 2;
 const GROUP_SIZE_MAX = 30;
-const PILOT_TOKEN_MIN_LENGTH = 16;
+const PILOT_TOKEN_MIN_LENGTH = 32;
+const PILOT_TOKEN_MAX_LENGTH = 128;
+const PILOT_TOKEN_REGEX = /^[A-Za-z0-9_-]+$/;
 
 export type GenerateRequest = {
   pilot_token: string;
@@ -43,8 +45,13 @@ export function validateGenerateRequest(input: unknown): GenerateRequest {
 
   const schema = z
     .object({
-      pilot_token: z.string().min(PILOT_TOKEN_MIN_LENGTH),
-      age_group: z.string().refine((value) => allowedAgeGroups.has(value), {
+      pilot_token: z
+        .string()
+        .trim()
+        .min(PILOT_TOKEN_MIN_LENGTH)
+        .max(PILOT_TOKEN_MAX_LENGTH)
+        .regex(PILOT_TOKEN_REGEX, 'Invalid pilot_token format.'),
+      age_group: z.string().trim().refine((value) => allowedAgeGroups.has(value), {
         message: 'Unsupported age_group.',
       }),
       duration_minutes: z
@@ -53,7 +60,7 @@ export function validateGenerateRequest(input: unknown): GenerateRequest {
         .refine((value) => DURATION_OPTIONS.includes(value as (typeof DURATION_OPTIONS)[number]), {
           message: 'Unsupported duration_minutes.',
         }),
-      theme: z.string().refine((value) => allowedThemes.has(value), {
+      theme: z.string().trim().refine((value) => allowedThemes.has(value), {
         message: 'Unsupported theme.',
       }),
       group_size: z.number().int().min(GROUP_SIZE_MIN).max(GROUP_SIZE_MAX),

@@ -3,8 +3,8 @@ import { createInstitution } from '../db/repo';
 
 export const createInstitutionSchema = z
   .object({
-    name: z.string().min(1).optional(),
-    city: z.string().min(1).default('Bucharest'),
+    name: z.string().trim().min(1).max(120).optional(),
+    city: z.string().trim().min(1).max(80).default('Bucharest'),
   })
   .strict();
 

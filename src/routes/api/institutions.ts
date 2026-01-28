@@ -1,12 +1,22 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router';
 import { randomUUID } from 'node:crypto';
 import { createInstitutionHandler } from '../../api/institutions';
 import type { CreateInstitutionResponse } from '../../api/institutions';
 import { logInfo } from '../../utils/logger';
+import { getCorsHeaders, getSecurityHeaders } from '../../utils/http';
 
 export const Route = createFileRoute('/api/institutions')({
   server: {
     handlers: {
+      OPTIONS: async ({ request }) => {
+        return new Response(null, {
+          status: 204,
+          headers: {
+            ...getSecurityHeaders(),
+            ...getCorsHeaders(request),
+          },
+        });
+      },
       POST: async ({ request }) => {
         const requestId = randomUUID();
         let payload: unknown;
@@ -22,16 +32,16 @@ export const Route = createFileRoute('/api/institutions')({
             },
           };
 
-          return jsonResponse(errorResponse, 400, requestId);
+          return jsonResponse(errorResponse, 400, requestId, request);
         }
 
         logInfo('request.received', { request_id: requestId, path: '/api/institutions' });
 
         const result = await createInstitutionHandler(payload);
-        return jsonResponse(result, statusFromResult(result), requestId);
+        return jsonResponse(result, statusFromResult(result), requestId, request);
       },
-    }
-  }
+    },
+  },
 });
 
 function statusFromResult(result: CreateInstitutionResponse): number {
@@ -48,12 +58,19 @@ function statusFromResult(result: CreateInstitutionResponse): number {
   }
 }
 
-function jsonResponse(body: CreateInstitutionResponse, status: number, requestId: string): Response {
+function jsonResponse(
+  body: CreateInstitutionResponse,
+  status: number,
+  requestId: string,
+  request: Request,
+): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       'content-type': 'application/json',
       'x-request-id': requestId,
+      ...getSecurityHeaders(),
+      ...getCorsHeaders(request),
     },
   });
 }
