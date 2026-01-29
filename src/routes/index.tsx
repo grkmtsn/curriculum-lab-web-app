@@ -30,7 +30,7 @@ const createPilotToken = createServerFn({ method: "POST" }).handler(async () => 
 
 function Home() {
   return (
-    <div>
+    <div className="bg-red-500 text-white p-4">
       <button
         type="button"
         onClick={async () => {
