@@ -37,6 +37,12 @@ export function checkNovelty(input: NoveltyCheckInput): NoveltyCheckResult {
   return { ok: true, score: maxScore, mostSimilar };
 }
 
+export function similarityScore(candidate: string, other: string): number {
+  const candidateTokens = tokenize(candidate);
+  const otherTokens = tokenize(other);
+  return jaccard(candidateTokens, otherTokens);
+}
+
 function tokenize(input: string): Set<string> {
   const tokens = input
     .toLowerCase()

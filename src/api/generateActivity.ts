@@ -2,7 +2,7 @@
 import { Prisma } from "../../prisma/generated/client";
 import { loadConfig } from "../config/loader";
 import { ACTIVITY_SCHEMA_VERSION } from "../config/schemas";
-import { createGeneration } from "../db/repo";
+import { createGeneration, listRecentGenerations } from "../db/repo";
 import { PilotTokenError, verifyPilotToken } from "../middleware/pilotAuth";
 import { enforceRateLimit, RateLimitError } from "../middleware/rateLimit";
 import {
@@ -12,6 +12,7 @@ import {
 import { orchestrateActivity, OrchestratorError } from "../services/orchestrator";
 import type { FinalActivity } from "../services/validators";
 import { logInfo, logMetric, logWarn } from "../utils/logger";
+import { similarityScore } from "../services/novelty";
 
 export type GenerateActivitySuccess = {
   schema_version: typeof ACTIVITY_SCHEMA_VERSION;
@@ -61,6 +62,20 @@ export async function generateActivity(
     await enforceRateLimit(authResult.institutionId);
 
     const config = loadConfig();
+
+    if (!request.regenerate) {
+      const cached = await findMostSimilarGeneration(authResult.institutionId, request);
+      if (cached) {
+        logMetric("generation.cache_hit", {
+          request_id: requestId,
+          generation_id: cached.id,
+        });
+        return {
+          schema_version: ACTIVITY_SCHEMA_VERSION,
+          activity: cached.activity,
+        };
+      }
+    }
     const result = await orchestrateActivity({
       request,
       institutionId: authResult.institutionId,
@@ -139,6 +154,89 @@ export async function generateActivity(
 
     return mapped;
   }
+}
+
+async function findMostSimilarGeneration(
+  institutionId: string,
+  request: ReturnType<typeof validateGenerateRequest>,
+) {
+  const recent = await listRecentGenerations(institutionId, 30);
+  const candidates = recent.filter((record) =>
+    matchesRequestPayload(record.requestPayload, request),
+  );
+
+  if (candidates.length === 0) {
+    return null;
+  }
+
+  const seed = candidates[0];
+  const seedText = `${extractTitle(seed.finalJson)} ${extractConcept(seed.outlineJson)}`.trim();
+  if (!seedText) {
+    return null;
+  }
+
+  let best = seed;
+  let bestScore = -1;
+
+  for (const record of candidates) {
+    const text = `${extractTitle(record.finalJson)} ${extractConcept(record.outlineJson)}`.trim();
+    if (!text) {
+      continue;
+    }
+    const score = similarityScore(seedText, text);
+    if (score > bestScore) {
+      bestScore = score;
+      best = record;
+    }
+  }
+
+  const activity = extractActivity(best.finalJson);
+  if (!activity) {
+    return null;
+  }
+
+  return { id: best.id, activity };
+}
+
+function matchesRequestPayload(
+  payload: unknown,
+  request: ReturnType<typeof validateGenerateRequest>,
+): boolean {
+  if (!payload || typeof payload !== "object") {
+    return false;
+  }
+  const data = payload as Record<string, unknown>;
+  return (
+    data.age_group === request.age_group &&
+    data.duration_minutes === request.duration_minutes &&
+    data.theme === request.theme &&
+    data.group_size === request.group_size &&
+    (data.energy_level ?? null) === (request.energy_level ?? null) &&
+    (data.curriculum_style ?? null) === (request.curriculum_style ?? null)
+  );
+}
+
+function extractTitle(finalJson: unknown): string {
+  if (!finalJson || typeof finalJson !== "object") {
+    return "";
+  }
+  const title = (finalJson as { title?: unknown }).title;
+  return typeof title === "string" ? title : "";
+}
+
+function extractConcept(outlineJson: unknown): string {
+  if (!outlineJson || typeof outlineJson !== "object") {
+    return "";
+  }
+  const concept = (outlineJson as { activity_concept?: unknown }).activity_concept;
+  return typeof concept === "string" ? concept : "";
+}
+
+function extractActivity(finalJson: unknown): FinalActivity["activity"] | null {
+  if (!finalJson || typeof finalJson !== "object") {
+    return null;
+  }
+  return finalJson as FinalActivity["activity"];
 }
 
 function mapGenerateError(error: unknown): GenerateActivityError {

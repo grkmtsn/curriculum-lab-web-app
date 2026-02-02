@@ -186,3 +186,28 @@ export async function createGeneration(
     errorCode: record.errorCode,
   };
 }
+
+export async function listRecentGenerations(
+  institutionId: string,
+  limit = 20,
+): Promise<GenerationRecord[]> {
+  const records = await prisma.generation.findMany({
+    where: { institutionId },
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+  });
+
+  return records.map((record) => ({
+    id: record.id,
+    institutionId: record.institutionId,
+    createdAt: record.createdAt,
+    requestPayload: record.requestPayload,
+    outlineJson: record.outlineJson,
+    finalJson: record.finalJson,
+    validationPass: record.validationPass,
+    latencyMs: record.latencyMs,
+    modelName: record.modelName,
+    regenerateFlag: record.regenerateFlag,
+    errorCode: record.errorCode,
+  }));
+}
